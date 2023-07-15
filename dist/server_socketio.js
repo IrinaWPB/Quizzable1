@@ -6,7 +6,7 @@ let player1;
 let player2;
 class SocketIOServer {
     constructor(server) {
-        this.io = new socket_io_1.Server(server, { cors: { origin: "http://localhost:3000", methods: ["GET", "POST"] } });
+        this.io = new socket_io_1.Server(server, { cors: { origin: "*", methods: ["GET", "POST"] } });
     }
     init() {
         this.listeners();

@@ -26,9 +26,6 @@ app.use(express_1.default.static(path_1.default.join(__dirname, "../public")));
 app.use('/users', userRoutes_1.userRouter);
 app.use('/auth', authRoutes_1.authRouter);
 app.use('/quizes', quizRoutes_1.quizRouter);
-app.use('/', (req, res, next) => {
-    res.send('Welcome To Express Server');
-});
 /** Handle 404 errors -- this matches everything */
 app.use('*', (req, res, next) => {
     next(new ExpressError_1.ExpressError("Page Not Found", 404));

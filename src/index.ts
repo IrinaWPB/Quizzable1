@@ -27,9 +27,6 @@ app.use(express.static(path.join(__dirname, "../public")))
 app.use('/users', userRouter)
 app.use('/auth', authRouter)
 app.use('/quizes', quizRouter)
-app.use('/', (req: Request, res: Response, next: NextFunction) => {
-	res.send('Welcome To Express Server')
-})
 
 /** Handle 404 errors -- this matches everything */
 app.use('*', (req: Request, res: Response, next: NextFunction) => {
