@@ -33,6 +33,7 @@ exports.authRouter.post('/register', (req, res, next) => __awaiter(void 0, void 
         return next(e);
     }
 }));
+
 exports.authRouter.post('/login', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { username, password } = req.body;
