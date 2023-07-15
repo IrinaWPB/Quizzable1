@@ -10,9 +10,9 @@ const authRoutes_1 = require("./routes/authRoutes");
 const auth_1 = require("./middleware/auth");
 const cors_1 = __importDefault(require("cors"));
 const quizRoutes_1 = require("./routes/quizRoutes");
-// socketio stuff //
-const server_socketio_1 = __importDefault(require("./server_socketio"));
 const path_1 = __importDefault(require("path"));
+// socketio import //
+const server_socketio_1 = __importDefault(require("./server_socketio"));
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)());
 const server = http_1.default.createServer(app);

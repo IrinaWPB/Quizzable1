@@ -2,7 +2,7 @@ import { NextFunction, Router, Request, Response } from 'express'
 import { ExpressError } from '../ExpressError'
 import { createToken } from '../helpers/token'
 import { UserData } from '../types/UserType'
-import { User } from '../models/user'
+import { User } from '../models/User'
 
 export const authRouter = Router()
 

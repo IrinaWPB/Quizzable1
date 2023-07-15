@@ -13,7 +13,7 @@ exports.authRouter = void 0;
 const express_1 = require("express");
 const ExpressError_1 = require("../ExpressError");
 const token_1 = require("../helpers/token");
-const user_1 = require("../models/user");
+const User_1 = require("../models/User");
 exports.authRouter = (0, express_1.Router)();
 /**Register user */
 exports.authRouter.post('/register', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -22,7 +22,7 @@ exports.authRouter.post('/register', (req, res, next) => __awaiter(void 0, void 
         if (!username || !email || !password) {
             throw new ExpressError_1.ExpressError('All fields required', 400);
         }
-        const user = yield user_1.User.create(username, email, password);
+        const user = yield User_1.User.create(username, email, password);
         const token = (0, token_1.createToken)(user);
         return res.json({ token });
     }
@@ -33,14 +33,13 @@ exports.authRouter.post('/register', (req, res, next) => __awaiter(void 0, void 
         return next(e);
     }
 }));
-
 exports.authRouter.post('/login', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { username, password } = req.body;
         //make sure both fields are filled
         if (!username || !password)
             throw new ExpressError_1.ExpressError('Username and Password are requred', 400);
-        const user = yield user_1.User.authenticate(username, password);
+        const user = yield User_1.User.authenticate(username, password);
         const token = (0, token_1.createToken)(user);
         return res.json({ token });
     }

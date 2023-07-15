@@ -1,15 +1,14 @@
 import HTTP from "http";
 import express, { NextFunction, Request, Response } from 'express'
-import { ExpressError, ExpressErrorType } from './ExpressError'
+import { ExpressErrorType } from './ExpressError'
 import { userRouter } from './routes/userRoutes'
 import { authRouter } from './routes/authRoutes'
 import { authenticateJWT } from './middleware/auth'
 import cors from 'cors'
 import { quizRouter } from './routes/quizRoutes'
-// socketio stuff //
-import SocketIOServer from "./server_socketio";
 import path from 'path'
-
+// socketio import //
+import SocketIOServer from "./server_socketio";
 
 const app: express.Application = express()
 app.use(cors());

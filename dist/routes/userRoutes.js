@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.userRouter = void 0;
 const express_1 = require("express");
-const user_1 = require("../models/user");
+const User_1 = require("../models/User");
 const auth_1 = require("../middleware/auth");
 const token_1 = require("../helpers/token");
 const ExpressError_1 = require("../ExpressError");
@@ -19,7 +19,7 @@ exports.userRouter = (0, express_1.Router)();
 /**Get all users */
 exports.userRouter.get('/', auth_1.ensureLoggedIn, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const users = yield user_1.User.getAll();
+        const users = yield User_1.User.getAll();
         return res.json(users);
     }
     catch (e) {
@@ -28,7 +28,7 @@ exports.userRouter.get('/', auth_1.ensureLoggedIn, (req, res, next) => __awaiter
 }));
 exports.userRouter.get('/user/:username', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const user = yield user_1.User.getByUsename(req.params.username);
+        const user = yield User_1.User.getByUsename(req.params.username);
         return res.json(user);
     }
     catch (e) {
@@ -38,7 +38,7 @@ exports.userRouter.get('/user/:username', (req, res, next) => __awaiter(void 0, 
 /**Get user by id */
 exports.userRouter.get('/:id', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const user = yield user_1.User.getById(+req.params.id);
+        const user = yield User_1.User.getById(+req.params.id);
         return res.json(user);
     }
     catch (e) {
@@ -52,7 +52,7 @@ exports.userRouter.post('/', (req, res, next) => __awaiter(void 0, void 0, void 
         if (!username || !email || !password) {
             throw new ExpressError_1.ExpressError("Missing data", 400);
         }
-        const user = yield user_1.User.create(username, email, password);
+        const user = yield User_1.User.create(username, email, password);
         const token = (0, token_1.createToken)(user);
         return res.status(201).json({ user, token });
     }

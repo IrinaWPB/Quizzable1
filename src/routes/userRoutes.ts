@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, Router  } from 'express'
-import { User } from '../models/user'
+import { User } from '../models/User'
 import { UserData } from '../types/UserType'
 import { ensureLoggedIn } from '../middleware/auth'
 import { createToken } from '../helpers/token'
