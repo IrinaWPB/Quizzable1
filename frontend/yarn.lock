@@ -3298,7 +3298,7 @@
     "node-releases" "^2.0.8"
     "update-browserslist-db" "^1.0.10"
 
-"bs-logger@0.x":
+"bs-logger@^0.2.6", "bs-logger@0.x":
   "integrity" "sha512-pd8DCoxmbgc7hyPKOvxtqNcjYoOsABPQdcCUjGp3d42VR2CX1ORhk2A87oqqu5R1kk+76nsxZupkmyd+MVtCog=="
   "resolved" "https://registry.npmjs.org/bs-logger/-/bs-logger-0.2.6.tgz"
   "version" "0.2.6"

@@ -23,7 +23,6 @@ app.use(express.urlencoded({ extended: true })) //if form data sent
 
 app.use(authenticateJWT)
 
-
 app.use('/users', userRouter)
 app.use('/auth', authRouter)
 app.use('/quizes', quizRouter)
