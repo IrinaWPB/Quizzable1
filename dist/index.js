@@ -5,7 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const http_1 = __importDefault(require("http"));
 const express_1 = __importDefault(require("express"));
-const ExpressError_1 = require("./ExpressError");
 const userRoutes_1 = require("./routes/userRoutes");
 const authRoutes_1 = require("./routes/authRoutes");
 const auth_1 = require("./middleware/auth");
@@ -22,13 +21,12 @@ new server_socketio_1.default(server).init();
 app.use(express_1.default.json()); //if json sent
 app.use(express_1.default.urlencoded({ extended: true })); //if form data sent
 app.use(auth_1.authenticateJWT);
-app.use(express_1.default.static(path_1.default.join(__dirname, "../public")));
 app.use('/users', userRoutes_1.userRouter);
 app.use('/auth', authRoutes_1.authRouter);
 app.use('/quizes', quizRoutes_1.quizRouter);
-/** Handle 404 errors -- this matches everything */
-app.use('*', (req, res, next) => {
-    next(new ExpressError_1.ExpressError("Page Not Found", 404));
+app.use(express_1.default.static(path_1.default.join(__dirname, "../frontend/build")));
+app.get('*', (req, res) => {
+    res.sendFile(path_1.default.join(__dirname, 'frontend/build', 'index.html'));
 });
 /** Generic error handler; anything unhandled goes here. */
 app.use((error, req, res, next) => {

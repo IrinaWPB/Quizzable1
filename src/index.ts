@@ -22,17 +22,16 @@ app.use(express.json()) //if json sent
 app.use(express.urlencoded({ extended: true })) //if form data sent
 
 app.use(authenticateJWT)
-app.use(express.static(path.join(__dirname, "../public")))
+
 
 app.use('/users', userRouter)
 app.use('/auth', authRouter)
 app.use('/quizes', quizRouter)
 
-/** Handle 404 errors -- this matches everything */
-app.use('*', (req: Request, res: Response, next: NextFunction) => {
-   next(new ExpressError("Page Not Found", 404));
-});
-
+app.use(express.static(path.join(__dirname, "../frontend/build")))
+app.get('*', (req, res) => {
+	res.sendFile(path.join(__dirname, 'frontend/build', 'index.html'))
+})
 /** Generic error handler; anything unhandled goes here. */
 app.use((error: ExpressErrorType, req: Request, res: Response, next: NextFunction) => {
 	let status = error.status

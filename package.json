@@ -9,7 +9,8 @@
     "dev": "NODE_ENV=development concurrently \"npx tsc --watch\" \"nodemon -q dist/server.js\"",
     "ts-dev": " nodemon src/server.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "ts-test": "jest"
+    "ts-test": "jest",
+    "heroku-postbuild": "cd frontend %% npm install && npm run build" 
   },
   "keywords": [],
   "author": "",
