@@ -41,14 +41,14 @@ const SignIn: React.FunctionComponent<ISignInProps> = ({ login }): JSX.Element =
       setData(initialState)
     }
   }
-
+  console.log(errors)
   return(
     <FadeInDiv>
       <FormContainer>
       <Header>Please Login</Header>
       <form onSubmit={handleSubmit} className="ui form">
         <Errors>
-          {errors.map((e: string, i: number): JSX.Element => <p key={i}>* {e}</p>)}
+          {errors.length > 0 && errors.map((e: string, i: number): JSX.Element => <p key={i}>* {e}</p>)}
         </Errors>
         <Field>
           <label htmlFor='username'>Username</label>

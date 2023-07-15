@@ -45,7 +45,7 @@ const Register: React.FunctionComponent<IRegisterProps> = ({register}): JSX.Elem
       <Header>Registration Form</Header>
       <form onSubmit={handleSubmit} className="ui form">
         <Errors>
-          {errors.map((e: string, i: number): JSX.Element => <p key={i}>* {e}</p>)}
+          {errors && errors.map((e: string, i: number): JSX.Element => <p key={i}>* {e}</p>)}
         </Errors>
         <Field>
           <label htmlFor='username'>Username</label>

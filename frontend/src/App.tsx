@@ -10,7 +10,7 @@ import { AuthorizationPromise, LoginForm, RegistrationForm } from './types/form.
 import { DecodedUser } from './types/user.ts';
 import { Container, AppRoutesWrapper } from './styles/app.styles.ts';
 import { clientSocketInstance } from './socketio-frontend.ts';
-
+console.log(UserApi)
 export const App: React.FunctionComponent = (): JSX.Element => {
 
   const [currentUser, setCurrentUser] = useState(null)

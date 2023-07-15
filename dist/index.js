@@ -21,13 +21,10 @@ new server_socketio_1.default(server).init();
 app.use(express_1.default.json()); //if json sent
 app.use(express_1.default.urlencoded({ extended: true })); //if form data sent
 app.use(auth_1.authenticateJWT);
-app.use('/users', userRoutes_1.userRouter);
-app.use('/auth', authRoutes_1.authRouter);
-app.use('/quizes', quizRoutes_1.quizRouter);
+app.use('/api/users', userRoutes_1.userRouter);
+app.use('/api/auth', authRoutes_1.authRouter);
+app.use('/api/quizes', quizRoutes_1.quizRouter);
 app.use(express_1.default.static(path_1.default.join(__dirname, "../frontend/build")));
-app.get('*', (req, res) => {
-    res.sendFile(path_1.default.join(__dirname, 'frontend/build', 'index.html'));
-});
 /** Generic error handler; anything unhandled goes here. */
 app.use((error, req, res, next) => {
     let status = error.status;

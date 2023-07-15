@@ -22,14 +22,12 @@ app.use(express.urlencoded({ extended: true })) //if form data sent
 
 app.use(authenticateJWT)
 
-app.use('/users', userRouter)
-app.use('/auth', authRouter)
-app.use('/quizes', quizRouter)
+app.use('/api/users', userRouter)
+app.use('/api/auth', authRouter)
+app.use('/api/quizes', quizRouter)
 
 app.use(express.static(path.join(__dirname, "../frontend/build")))
-app.get('*', (req, res) => {
-	res.sendFile(path.join(__dirname, 'frontend/build', 'index.html'))
-})
+
 /** Generic error handler; anything unhandled goes here. */
 app.use((error: ExpressErrorType, req: Request, res: Response, next: NextFunction) => {
 	let status = error.status

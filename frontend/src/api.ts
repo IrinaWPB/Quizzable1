@@ -4,7 +4,7 @@ import { LoginForm, RegistrationForm } from "./types/form";
 import { Quiz } from "./types/quiz";
 
 
-const BASE_URL = `https://quizzable-a90200121f06.herokuapp.com/`;
+const BASE_URL = `https://quizzable-a90200121f06.herokuapp.com/api`;
 
 /** API Class.
  *
