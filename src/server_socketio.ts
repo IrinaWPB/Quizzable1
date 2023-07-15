@@ -13,7 +13,7 @@ let player2: string;
 export default class SocketIOServer {
   private io: IOServer;
   constructor(server: HTTPServer) {
-    this.io = new IOServer(server, { cors: { origin: "http://localhost:3000", methods: ["GET", "POST"] } });
+    this.io = new IOServer(server, { cors: { origin: "*", methods: ["GET", "POST"] } });
   }
   
   public init(): void {
