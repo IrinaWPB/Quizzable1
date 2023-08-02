@@ -1,11 +1,11 @@
-import React, { useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Button, Icon, Menu, MenuItemProps } from "semantic-ui-react";
-import { clientSocketInstance } from '../socketio-frontend';
-import { ButtonElement } from './Button';
-import { OnlineContainer } from '../styles/statusBar.styles';
-import { OnlineContext, UserContext, OnlinePlayersContext } from '../context/UserContext';
-import { invitationSound } from './Sounds';
+import React, { useContext } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { Button, Icon, Menu, MenuItemProps } from "semantic-ui-react"
+import { clientSocketInstance } from '../socketio-frontend'
+import { ButtonElement } from './Button'
+import { OnlineContainer } from '../styles/statusBar.styles'
+import { OnlineContext, UserContext, OnlinePlayersContext } from '../context/UserContext'
+import { invitationSound } from './Sounds'
 
 interface IOnlineNavbarProps {}
 
@@ -18,7 +18,7 @@ enum MenuState {
 const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = () => {  
   const { online, setOnlineStatus } = React.useContext(OnlineContext)
   const { currentUser } = React.useContext(UserContext)
-  const [ activeItem, setActiveItem ] = React.useState<MenuState>();
+  const [ activeItem, setActiveItem ] = React.useState<MenuState>()
   const [ messageFrom, setMessageFrom ] = React.useState<string>(null)
 
   const { onlinePlayers, setOnlinePlayers } = useContext(OnlinePlayersContext)
@@ -36,15 +36,15 @@ const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = () => {
 
   //updates online players
   const handleOnlinePlayerChange = (data): void => {
-    setOnlinePlayers(data.players_online);
+    setOnlinePlayers(data.players_online)
   };
 
   //toggle button to go online/offline
   const handleOnlineButtonClick = (): void => {
     if (online) {
-      clientSocketInstance.emit("go_offline");
+      clientSocketInstance.emit("go_offline")
     } else {
-      clientSocketInstance.emit("go_online", { username: currentUser.username });
+      clientSocketInstance.emit("go_online", { username: currentUser.username })
     }
   }
   //updates messageFrom state
@@ -67,26 +67,25 @@ const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = () => {
   const handleItemClick = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>, data: MenuItemProps): void => {
     //if not online and want to see online users switvh to online
     if (!online && activeItem === MenuState.friends) {
-      clientSocketInstance.emit("go_online", { username: currentUser.username });
-      console.log()
+      clientSocketInstance.emit("go_online", { username: currentUser.username })
     }
-    setActiveItem(data.name as MenuState);
+    setActiveItem(data.name as MenuState)
   };
 
   React.useEffect(() => {
-    clientSocketInstance.on("online", setOnlineTrue);
-    clientSocketInstance.on("offline", setOnlineFalse);
-    clientSocketInstance.on("updated_online_players", handleOnlinePlayerChange);
+    clientSocketInstance.on("online", setOnlineTrue)
+    clientSocketInstance.on("offline", setOnlineFalse)
+    clientSocketInstance.on("updated_online_players", handleOnlinePlayerChange)
     clientSocketInstance.on("invitation", handleMessageUpdate)
 
     return () => {
-      clientSocketInstance.off("online", setOnlineTrue);
-      clientSocketInstance.off("offline", setOnlineFalse);
-      clientSocketInstance.off("updated_online_players", handleOnlinePlayerChange);
+      clientSocketInstance.off("online", setOnlineTrue)
+      clientSocketInstance.off("offline", setOnlineFalse)
+      clientSocketInstance.off("updated_online_players", handleOnlinePlayerChange)
       clientSocketInstance.off("invitation", handleMessageUpdate)
     } 
-  }, []);
-  
+  }, [])
+
   return (<>
     <OnlineContainer>
       <div style={{fontSize: "1.5rem"}}>
@@ -138,8 +137,7 @@ const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = () => {
         </div>
       </OnlineContainer> }
     </>
-);
-};
+)}
 
 export default OnlineNavbar;
 

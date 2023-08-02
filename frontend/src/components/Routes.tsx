@@ -1,17 +1,17 @@
-import HomePage from './HomePage';
-import SignIn from './forms/SignIn';
-import Register from './forms/Register';
-import Profile from './Profile';
-import Categories from './Categories';
-import StartGame from './game/StartGame';
-import StartMultiPlayerGame from './game/StartMultiPlayerGame';
-import { LoginForm, RegistrationForm, AuthorizationPromise } from '../types/form';
-import { Routes, Route } from 'react-router-dom';
+import HomePage from './HomePage'
+import SignIn from './forms/SignIn'
+import Register from './forms/Register'
+import Profile from './Profile'
+import Categories from './Categories'
+import StartGame from './game/StartGame'
+import StartMultiPlayerGame from './game/StartMultiPlayerGame'
+import { LoginForm, RegistrationForm, AuthorizationPromise } from '../types/form'
+import { Routes, Route } from 'react-router-dom'
 
 
 interface IRoutesProps {
- login: (loginData: LoginForm) => Promise<AuthorizationPromise>;
- register: (signupData: RegistrationForm) => Promise<AuthorizationPromise>;
+ login: (loginData: LoginForm) => Promise<AuthorizationPromise>
+ register: (signupData: RegistrationForm) => Promise<AuthorizationPromise>
  setMultiNavShow: (status: boolean) => void
  multiNavShow: boolean
 }

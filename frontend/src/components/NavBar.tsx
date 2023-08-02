@@ -7,9 +7,9 @@ import { NavBarContainer,
          RightContainer,
          OpenButton,
          Logo } from '../styles/navBar.styles'
-import { useContext, useState } from "react";
-import { UserContext } from "../context/UserContext";
-import { clickSound, hoverSound } from "./Sounds";
+import { useContext, useState } from "react"
+import { UserContext } from "../context/UserContext"
+import { clickSound, hoverSound } from "./Sounds"
 
 
 interface INavBarProps {

@@ -1,10 +1,10 @@
-import React, { useContext, useState, useEffect } from "react";
-import { UserContext } from "../context/UserContext";
-import { Quiz } from "../types/quiz";
-import { ButtonElement } from "./Button";
-import { useNavigate } from "react-router-dom";
-import UserApi from "../api";
-import { ScoreHeader, List, Container, Result, Header } from "../styles/profile.styles";
+import React, { useContext, useState, useEffect } from "react"
+import { UserContext } from "../context/UserContext"
+import { Quiz } from "../types/quiz"
+import { ButtonElement } from "./Button"
+import { useNavigate } from "react-router-dom"
+import UserApi from "../api"
+import { ScoreHeader, List, Container, Result, Header } from "../styles/profile.styles"
 
 export interface IProfileProps {}
 
