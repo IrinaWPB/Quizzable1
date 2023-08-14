@@ -22,9 +22,11 @@ Challenges anticipated with this project include data privacy, accuracy of story
        - https://quizapi.io/
        - https://opendb.com/ 
 
-"Npm i" after cloning for both frontend and backend
-Tests run separately for backend and frontend
-More features to be added..
+"Npm i" after cloning for both frontend and backend.
+
+Tests run separately for backend and frontend.
+
+More features to be added.
 
 # Happy [Quizzing](https://quizzable-a90200121f06.herokuapp.com/)!
 
