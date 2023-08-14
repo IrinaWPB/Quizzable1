@@ -1,5 +1,4 @@
 import { Server as IOServer } from "socket.io";
-//
 import type { Server as HTTPServer } from "http";
 
 type OnlinePlayers = {
@@ -10,6 +9,7 @@ let onlinePlayers: OnlinePlayers = {}
 let player1: string;
 let player2: string;
 
+//Define Socket Server Class
 export default class SocketIOServer {
   private io: IOServer;
   constructor(server: HTTPServer) {
@@ -19,18 +19,24 @@ export default class SocketIOServer {
   public init(): void {
     this.listeners();
   } 
+
   private listeners(): void {
+
+    //start listening for emitters when connection is on
     this.io.on("connection", (socket) => {
       console.log("client connected");
       console.log(socket.id);
+
+      // adds user to online players list when user clicks "go_online"
       socket.on("go_online", (data) => {
-        onlinePlayers[socket.id] =  data.username ;
+        onlinePlayers[socket.id] = data.username ;
         socket.emit("online", "you are online");
         console.log('onlinePlayers:', onlinePlayers);
         // emit to everyone the new number of online players //
         this.io.emit("updated_online_players", { players_online: onlinePlayers });
       })
-
+      
+      //removes user from online players list when user clicks "go_offline"
       socket.on("go_offline", () => {
         delete onlinePlayers[socket.id]
         socket.emit("offline", "you are offline");
@@ -38,13 +44,22 @@ export default class SocketIOServer {
         // emit to everyone the new number of online players //
         this.io.emit("updated_online_players", { players_online: onlinePlayers});
       })
+
+      /** when user clicks "invite" and picks a player 
+       * app assignes users ids to online player1 and online player2" 
+       */
       socket.on("send_invitation", (data) => {
         player1 = data.toId
         player2 = data.fromId
         console.log('player1', player1, 'player2', player2)
+        //emits to the opponent(sends invitation)
         socket.to(player1).emit('invitation', { invitation_from: player2 })
       })
-
+      
+      /** when user clicks "join game" 
+       * app emits prompt to start a game to both players
+       * and game starts
+       */
       socket.on("join_game", (data) =>{
         console.log("sending 'start_game' to", data.toId )
         socket.to(data.toId).emit('start_game', { you: data.toId, opponent: onlinePlayers[data.fromId]}) 
@@ -52,6 +67,7 @@ export default class SocketIOServer {
         socket.emit('start_game', { you: data.fromId, opponent: onlinePlayers[data.toId]})
       }) 
 
+      //when score changes, new score is emitted and updated for both users
       socket.on("score_update", (data) => {
         console.log(data.newScore)
         socket.emit("new_score", { score: data.newScore })
@@ -61,7 +77,6 @@ export default class SocketIOServer {
           socket.to(player1).emit("opponent_new_score", { score: data.newScore})
         }
       })
-      
     });
   }
 }

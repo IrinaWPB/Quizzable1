@@ -13,10 +13,18 @@ exports.userRouter = void 0;
 const express_1 = require("express");
 const User_1 = require("../models/User");
 const auth_1 = require("../middleware/auth");
-const token_1 = require("../helpers/token");
-const ExpressError_1 = require("../ExpressError");
 exports.userRouter = (0, express_1.Router)();
-/**Get all users */
+// Get a user by username
+exports.userRouter.get('/user/:username', auth_1.ensureLoggedIn, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const user = yield User_1.User.getByUsename(req.params.username);
+        return res.json(user);
+    }
+    catch (e) {
+        return next(e);
+    }
+}));
+// Gets all users (future development)
 exports.userRouter.get('/', auth_1.ensureLoggedIn, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const users = yield User_1.User.getAll();
@@ -26,17 +34,8 @@ exports.userRouter.get('/', auth_1.ensureLoggedIn, (req, res, next) => __awaiter
         return next(e);
     }
 }));
-exports.userRouter.get('/user/:username', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const user = yield User_1.User.getByUsename(req.params.username);
-        return res.json(user);
-    }
-    catch (e) {
-        return next(e);
-    }
-}));
-/**Get user by id */
-exports.userRouter.get('/:id', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+// Get user by id (future features)
+exports.userRouter.get('/:id', auth_1.ensureLoggedIn, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const user = yield User_1.User.getById(+req.params.id);
         return res.json(user);
@@ -45,29 +44,14 @@ exports.userRouter.get('/:id', (req, res, next) => __awaiter(void 0, void 0, voi
         return next(e);
     }
 }));
-/**Create a new user and return it */
-exports.userRouter.post('/', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+// Delete user (future features) 
+exports.userRouter.delete('/:id', auth_1.ensureLoggedIn, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { username, email, password } = req.body;
-        if (!username || !email || !password) {
-            throw new ExpressError_1.ExpressError("Missing data", 400);
-        }
-        const user = yield User_1.User.create(username, email, password);
-        const token = (0, token_1.createToken)(user);
-        return res.status(201).json({ user, token });
+        const id = +req.params.id;
+        const user = yield User_1.User.remove(id);
+        return res.json({ messege: 'USER IS DELETED' });
     }
     catch (e) {
         return next(e);
     }
 }));
-/**Delete user to be used for future features */
-// userRouter.delete('/:id', async(req: Request, res: Response, next: NextFunction) => {
-//   try {
-// 	const id = +req.params.id
-// 	const user = await User.getById(id) as User
-// 	await user.remove()
-// 	return res.json({messege: 'USER IS DELETED'})
-//   } catch (e) {
-// 	return next (e)
-// 	}
-// })

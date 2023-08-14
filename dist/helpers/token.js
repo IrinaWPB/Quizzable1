@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createToken = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const config_1 = require("../config");
-/** return signed JWT from user data. */
+// Takes username, creates and returns signed JWT. 
 function createToken(user) {
     let payload = {
         username: user.username

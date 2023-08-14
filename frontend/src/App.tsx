@@ -14,15 +14,18 @@ import { clientSocketInstance } from './socketio-frontend.ts';
 export const App: React.FunctionComponent = (): JSX.Element => {
 
   const [currentUser, setCurrentUser] = useState(null)
+
+  //automatically adds a new token/ delete a token
   const [token, setToken] = useLocalStorage("token")
   const [catCode, setCode] = useState(9)
   const [multiNavShow, setMultiNavShow] = useState<boolean>(false)
   const [online, setOnlineStatus] = useState<boolean>(false)
   const [onlinePlayers, setOnlinePlayers] = useState({})
 
-  // Load user info from API. Until a user is logged in and they have a token,
-  // this should not run. It only needs to re-run when a user logs out, so
-  // the value of the token is a dependency for this effect.
+  /**  Load user info from API. Until a user is logged in and they have a token,
+  * this should not run. It only needs to re-run when a user logs out(deletes token), so
+  * the value of the token is a dependency for this effect.
+  */
   useEffect(
     function loadUserInfo() {
       async function getCurrentUser(): Promise<void> {
@@ -71,14 +74,19 @@ export const App: React.FunctionComponent = (): JSX.Element => {
     }
   }
 
-  /** Handles site-wide logout. */
+  // Handles site-wide logout
   async function logout(): Promise<void> {
     setCurrentUser(null);
     setToken(null);
     setMultiNavShow(false)
+    //when user logs out they're automatically removed from online players
     clientSocketInstance.emit('go_offline')
   }
   
+  /** App returns Navbar and all Routes wrapped in
+   * Context Providers to have it's values accessible
+   * throughout the app
+   */
   return (
     <Container>
         <UserContext.Provider value={{ currentUser }}>

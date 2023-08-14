@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken'
 import { UserData } from '../types/UserType';
 import { SECRET_KEY }from '../config'
 
-/** return signed JWT from user data. */
+// Takes username, creates and returns signed JWT. 
 export function createToken(user: UserData) {
   let payload = {
     username: user.username

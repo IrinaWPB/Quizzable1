@@ -2,6 +2,13 @@ import axios from 'axios'
 import { QUIZ_API_KEY } from '../configs'
 import { QuestionType } from '../types/question'
 
+/** Platforms used for fetching questions return 
+ * data that is structured very differently,
+ * 
+ * Returned results have to have the same structure in order
+ * for the app to manupulate/style/read both of them the same way
+ */
+
 //Get data from QiuzApp for category "Programming"
 async function getTechQuestions() {
 	
@@ -9,26 +16,26 @@ async function getTechQuestions() {
 	const result = await axios.get(`https://quizapi.io/api/v1/questions?apiKey=${QUIZ_API_KEY}&limit=40`)
     console.log(result)
 	for (let q of result.data) {
-    const id: number = q.id
-		const question: string = q.question
-		let answers: string[] = []
-		for (let a in q.answers) {
-			if (q.answers[a] !== null) {
-				answers.push(q.answers[a])
-			}
+      const id: number = q.id
+	  const question: string = q.question
+	  let answers: string[] = []
+	  for (let a in q.answers) {
+		if (q.answers[a] !== null) {
+		  answers.push(q.answers[a])
 		}
-		
-		let correctAnswer: string;
-		for (let a in q.correct_answers) {
-			console.log(a, q.correct_answers[a], q.answers[a])
-		 	if (q.correct_answers[a] === 'true') {
-				a = a.slice(0, 8)
-				console.log('a', a, 'correct answer', q.answers[a])
-		 		correctAnswer = q.answers[a]
-		  }
+	  }
+	  //exctracting correct answer
+	  let correctAnswer: string;
+	  for (let a in q.correct_answers) {
+		console.log(a, q.correct_answers[a], q.answers[a])
+		if (q.correct_answers[a] === 'true') {
+		  a = a.slice(0, 8)
+		  console.log('a', a, 'correct answer', q.answers[a])
+		  correctAnswer = q.answers[a]
 		}
-		let newQuestion: QuestionType = {id, question, answers, correctAnswer}
-	    questions.push(newQuestion)
+	  }
+	  let newQuestion: QuestionType = {id, question, answers, correctAnswer}
+	  questions.push(newQuestion)
 	}
 	return questions
 }
@@ -55,13 +62,13 @@ async function getTriviaQuestions(code: number) {
   return questions
 }
 
-
+//Fetch questions based on a category code 
 export async function getQuestions(code: number) {
-	let result: QuestionType[]
-	if (code === 1) {
-		result = await getTechQuestions()
-	} else {
-		result = await getTriviaQuestions(code)
-	}
-	return result
+  let result: QuestionType[]
+  if (code === 1) {
+	result = await getTechQuestions()
+  } else {
+	result = await getTriviaQuestions(code)
+  }
+  return result
 }

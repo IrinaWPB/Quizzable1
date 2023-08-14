@@ -9,6 +9,11 @@ interface IRegisterProps {
   register: (data: RegistrationForm) => Promise<{ success: boolean; errors?: any}>
 }
 
+
+/** Register component takes passed register() prop and uses it when data is submitted.
+ * Returns Registration Form with 3 input fields (username, password and email)
+ * If registration is successful - navigates to home page (token is stored in local starage)
+ */
 const Register: React.FunctionComponent<IRegisterProps> = ({register}): JSX.Element => {
   
   const navigate = useNavigate()
@@ -21,14 +26,16 @@ const Register: React.FunctionComponent<IRegisterProps> = ({register}): JSX.Elem
   const [data, setData] = useState(initialState)
   const [errors, setErrors] = useState([])
 
+  //updates state as user types
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const {name, value}= e.target
     setData((data: RegistrationForm) =>({
         ...data,
         [name]:value 
     }))
-  
-}
+  }
+
+  //Takes current data (if valid) and passes it to register function, navigates to homepage.
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault()
     let result = await register(data)
@@ -36,6 +43,7 @@ const Register: React.FunctionComponent<IRegisterProps> = ({register}): JSX.Elem
       navigate('/')
     } else {
       setErrors(result.errors)
+      setData(initialState)
     }
 }
 

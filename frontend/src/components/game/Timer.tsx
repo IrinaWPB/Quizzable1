@@ -7,15 +7,20 @@ import { themeMusic } from "../Sounds.tsx";
 interface ITimerProps {
   endGame(): Promise<void>;
 }
-//Timer watches time remaining for the game
+/** Timer watches and renders time remaining for the game, takes endGame() prop from Questions
+ * component and runs it when time is up
+ */
+
 const Timer: React.FunctionComponent<ITimerProps> =  ({ endGame }): JSX.Element => {
   const [timer, setTimer] = useState(GAME_DURATION)
  
+  //sets interval and starts playing themeSound
   useEffect(() => {
     themeMusic.play()
     const intervalId = setInterval(() => {
       setTimer((t: number) => t - 1)
     }, 1000)
+    //clears interval and stops music(sets to start) when unmounted
     return () => {
       clearInterval(intervalId)
       themeMusic.pause()
@@ -26,6 +31,7 @@ const Timer: React.FunctionComponent<ITimerProps> =  ({ endGame }): JSX.Element 
   if (timer === 0) {
     endGame()
   }
+  
   return (
 		<Container>
 			<Header>

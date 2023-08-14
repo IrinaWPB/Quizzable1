@@ -5,7 +5,7 @@ interface IScoreProps {
   score: number
 }
 
-//Renders current score
+//Renders current score (takes prop from Questions component)
 const Score: React.FunctionComponent<IScoreProps> = ({ score }): JSX.Element => {
   return (
 	<Container>

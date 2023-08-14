@@ -12,10 +12,14 @@ interface IEndGameProps {
   status?: FinalStatus 
 }
 
-/** Renders when time is out or no more questions left */
+/** Renders when time is out or no more questions left 
+ * if single user game - renders score and option to play again
+ * if multiplayer game - shows winner/loser status and option to play again
+*/
 const EndGame: React.FunctionComponent<IEndGameProps> = ({ score, playAgain, status }): JSX.Element => {
   const { online } = useContext(OnlineContext)
   const navigate = useNavigate()
+
   return (
 	<FadeInDiv>
 	  { online 

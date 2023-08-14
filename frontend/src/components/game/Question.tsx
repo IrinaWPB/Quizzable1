@@ -1,7 +1,7 @@
 import { QuestionType } from "../../types/question"
 import { FadeInDiv } from "../Animation"
 import "./Question.css"
-import { hoverSound, scoreSound, failSound } from "../Sounds"
+import { hoverSound, scoreSound, failSound }  from "../Sounds"
 import { Container, 
          QuestionText, 
          AnswersContainer, 

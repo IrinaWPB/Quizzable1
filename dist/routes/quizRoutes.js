@@ -12,19 +12,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.quizRouter = void 0;
 const express_1 = require("express");
 const Quiz_1 = require("../models/Quiz");
+const auth_1 = require("../middleware/auth");
 exports.quizRouter = (0, express_1.Router)();
-/**Get all users */
-exports.quizRouter.get('/', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+// Get all quizzes
+exports.quizRouter.get('/', auth_1.ensureLoggedIn, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const quizes = yield Quiz_1.Quiz.getAllQuizes();
-        return res.json(quizes);
+        const quizzes = yield Quiz_1.Quiz.getAllQuizzes();
+        return res.json(quizzes);
     }
     catch (e) {
         return next(e);
     }
 }));
-/**Get user by id */
-exports.quizRouter.get('/quiz/:id', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+// Get quiz by id 
+exports.quizRouter.get('/quiz/:id', auth_1.ensureLoggedIn, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const quiz = yield Quiz_1.Quiz.getQuizById(+req.params.id);
         return res.json(quiz);
@@ -33,18 +34,18 @@ exports.quizRouter.get('/quiz/:id', (req, res, next) => __awaiter(void 0, void 0
         return next(e);
     }
 }));
-/**Get user by category */
-// for future features
-// quizRouter.get('/cat/:category', async (req: Request, res: Response, next: NextFunction) => {
-//   try{
-//     const quiz = await Quiz.getByCategory(req.params.category)
-// 	return res.json(quiz)
-//   } catch (e) {
-// 	return next(e)
-//   }
-// })
-/**Adds taken quiz to db */
-exports.quizRouter.post('/', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+// Get quiz by category for future features
+exports.quizRouter.get('/cat/:category', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const quiz = yield Quiz_1.Quiz.getByCategory(req.params.category);
+        return res.json(quiz);
+    }
+    catch (e) {
+        return next(e);
+    }
+}));
+// Adds a new taken quiz to db 
+exports.quizRouter.post('/', auth_1.ensureLoggedIn, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { category, score, user_id } = req.body;
         const quiz = yield Quiz_1.Quiz.addTakenQuiz(category, score, user_id);
@@ -54,18 +55,18 @@ exports.quizRouter.post('/', (req, res, next) => __awaiter(void 0, void 0, void 
         return next(e);
     }
 }));
-/** Route to get all complete quizes by user */
-exports.quizRouter.get('/user/:id', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+// Route to get all complete quizzes by user 
+exports.quizRouter.get('/user/:id', auth_1.ensureLoggedIn, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const quizes = yield Quiz_1.Quiz.getQuizesByUserId(+req.params.id);
-        return res.json(quizes);
+        const quizzes = yield Quiz_1.Quiz.getQuizzesByUserId(+req.params.id);
+        return res.json(quizzes);
     }
     catch (e) {
         return next(e);
     }
 }));
-/** Route to update score */
-exports.quizRouter.patch('/:id', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+// Route to update score 
+exports.quizRouter.patch('/:id', auth_1.ensureLoggedIn, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { score } = req.body;
     try {
         const quiz = yield Quiz_1.Quiz.updateScore(+req.params.id, score);

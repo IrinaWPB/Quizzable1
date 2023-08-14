@@ -11,16 +11,24 @@ export class User {
 	public password: string
   ) {} 
 
-/**Get all users method
- * **** to be used for future features *******
-*/
+//_______Get by username, returns new User instance
+  static async getByUsename(username: string): Promise<UserData> {
+    const results = await db.query(
+	  `SELECT * FROM users
+	   WHERE username = $1`, [username])
+	const u = results.rows[0] as UserData
+	if (!u) throw new NotFoundError()
+	return new User(u.id, u.username, u.email, u.password)
+   }
+
+//_______Get all users method (future features)
   static async getAll(): Promise<UserData[]> {
 	const results = await db.query(`SELECT * FROM users`)
 	const users = results.rows as UserData[]
 	return users
   }
 
-/**Get user by id */
+//_______Get user by id (future development)
   static async getById(id: number): Promise<UserData> {
     const results = await db.query(
 	  `SELECT * FROM users
@@ -30,18 +38,9 @@ export class User {
 	return new User(u.id, u.username, u.email, u.password)
    }
 
-/**Get by username */
-  static async getByUsename(username: string): Promise<UserData> {
-    const results = await db.query(
-	  `SELECT * FROM users
-	   WHERE username = $1`, [username])
-	const u = results.rows[0] as UserData
-	if (!u) throw new NotFoundError()
-	return new User(u.id, u.username, u.email, u.password)
-   }
-   
-/**Create a new user */
+//_______Adds a new user to DB, returns that user instance
   static async create(username: string, email: string, password: string): Promise<UserData> {
+	//password gets hashed first
 	const hashedPassword = await bcrypt.hash(password, process.env.BCRYPT_ROUNDS || 10)
 	const results = await db.query(
 		`INSERT INTO users (username, email, password) 
@@ -51,7 +50,7 @@ export class User {
 	return new User(u.id, u.username, u.email, u.password)
 	}
 
-/**Log user in */
+//______Authenticates user info using bcript.compare()
   static async authenticate(username: string, password: string): Promise<UserData> {
 	const results = await db.query(
 		`SELECT * FROM users
@@ -65,10 +64,8 @@ export class User {
 	throw new ExpressError('Invalid credentials', 403)
   }
 
-/**Delete user 
- ******* to be used for future features ********
-*/
-//   async remove(): Promise<void> {
-// 	   await db.query(`DELETE FROM users WHERE id = $1`, [this.id])
-//   }
+//_____Deletes user (future development)
+  static async remove(id: number): Promise<void> {
+	   await db.query(`DELETE FROM users WHERE id = $1`, [id])
+  }
 }

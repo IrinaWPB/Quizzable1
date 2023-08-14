@@ -8,17 +8,20 @@ import { ScoreHeader, List, Container, Result, Header } from "../styles/profile.
 
 export interface IProfileProps {}
 
+/** Profile component takes current user(access form context)
+ * returns a list of top (max 10) scores in played categories
+ */
 const Profile: React.FunctionComponent<IProfileProps> = (): JSX.Element => {
   const { currentUser } = useContext(UserContext)
   const navigate = useNavigate()
-  const [quizes, setQuizes] = useState([])
+  const [quizzes, setQuizzes] = useState([])
   
   useEffect(() => {
     async function getUsersResults(): Promise<void> {
-      let allQuizes: Quiz[] = await UserApi.getUsersQuizes(currentUser.id)
-      allQuizes.sort((a,b) => b.score - a.score)
-      allQuizes = allQuizes.slice(0,10)
-      setQuizes(allQuizes)
+      let allQuizzes: Quiz[] = await UserApi.getUsersQuizzes(currentUser.id)
+      allQuizzes.sort((a,b) => b.score - a.score)
+      allQuizzes = allQuizzes.slice(0,10)
+      setQuizzes(allQuizzes)
     }
     if (currentUser) {
       getUsersResults()
@@ -36,10 +39,10 @@ const Profile: React.FunctionComponent<IProfileProps> = (): JSX.Element => {
         <Header>{currentUser.username}</Header>
         <ButtonElement text="Start New Game" actions={() => navigate('/categories')} />
         <ScoreHeader>Your top scores:</ScoreHeader>
-        {!quizes
+        {!quizzes
           ? <h3>No quizes yet</h3>
           : <List>
-              {quizes.map((q: Quiz) => <Result key={q.id}>{q.category} - {q.score}</Result>)}
+              {quizzes.map((q: Quiz) => <Result key={q.id}>{q.category} - {q.score}</Result>)}
             </List>}
       </Container>} 
     </>

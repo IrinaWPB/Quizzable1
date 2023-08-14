@@ -45,6 +45,8 @@ it('renders list of categories for authorized users', async () => {
   
   expect(getByText('Nature')).toBeInTheDocument()
   expect(getByText('Music')).toBeInTheDocument()
+
+  //click on category
   const someCategoryCard = getByText('Music')
   const spy = jest.spyOn(someCategoryCard, 'click')
   act(()=> fireEvent.click(someCategoryCard))

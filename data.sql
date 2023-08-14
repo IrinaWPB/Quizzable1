@@ -4,7 +4,8 @@ CREATE DATABASE capUsersdb;
 
 \c capUsersdb;
 
-DROP TABLE IF EXISTS quizes;
+
+DROP TABLE IF EXISTS quizzes;
 
 DROP TABLE IF EXISTS users;
 
@@ -16,7 +17,7 @@ CREATE TABLE users (
     password text NOT NULL
 );
 
-CREATE TABLE quizes (
+CREATE TABLE quizzes (
     id SERIAL PRIMARY KEY,
     category text NOT NULL,
     score INT NOT NULL,

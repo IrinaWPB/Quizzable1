@@ -13,6 +13,15 @@ interface IHomePageProps {
   multiNavShow: boolean
 }
 
+/** HomePage component renders a set of options(buttons) 
+ * using context (checks if there is a current user)
+ * 
+ * Start Game, Select Category, Multiplayer Game - for logged in users
+ * Start Game, Login, Register, Multiplayer Game - for not logged in users
+ * 
+ * "Multiplayer Game" click will render OnlineNavBar on the same page
+ * (only available for logged in users)
+ */
 const HomePage: React.FunctionComponent<IHomePageProps> = ({ setMultiNavShow, multiNavShow }): JSX.Element => {
   const { currentUser } = useContext(UserContext)
   const navigate = useNavigate()
@@ -32,9 +41,8 @@ const HomePage: React.FunctionComponent<IHomePageProps> = ({ setMultiNavShow, mu
 		  </SlideLeftDiv>
 		</FadeInDiv>
 		
-	  {currentUser 
-
-		? <FadeInDiv>
+	  {currentUser ?
+		<FadeInDiv>
 			<SlideRightDiv>
 			  <ButtonElement text="Select Category" actions={() => navigate('/categories')} />	
 			</SlideRightDiv>

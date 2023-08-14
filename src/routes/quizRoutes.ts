@@ -1,21 +1,22 @@
 import { NextFunction, Router, Request, Response } from 'express'
 import { Quiz } from '../models/Quiz'
 import { QuizType } from '../types/QuizType'
+import { ensureLoggedIn } from '../middleware/auth'
 
 export const quizRouter = Router()
 
-/**Get all users */
-quizRouter.get('/', async (req: Request, res: Response, next: NextFunction) => {
+// Get all quizzes
+quizRouter.get('/', ensureLoggedIn, async (req: Request, res: Response, next: NextFunction) => {
 	try {
-	  const quizes = await Quiz.getAllQuizes()
-	  return res.json(quizes)
+	  const quizzes = await Quiz.getAllQuizzes()
+	  return res.json(quizzes)
 	} catch (e) {
 	  return next(e)
 	}
 })
 
-/**Get user by id */
-quizRouter.get('/quiz/:id', async (req: Request, res: Response, next: NextFunction) => {
+// Get quiz by id 
+quizRouter.get('/quiz/:id', ensureLoggedIn, async (req: Request, res: Response, next: NextFunction) => {
   try{
 	const quiz = await Quiz.getQuizById(+req.params.id)
     return res.json(quiz)
@@ -24,19 +25,18 @@ quizRouter.get('/quiz/:id', async (req: Request, res: Response, next: NextFuncti
   }
 })
 
-/**Get user by category */
-// for future features
-// quizRouter.get('/cat/:category', async (req: Request, res: Response, next: NextFunction) => {
-//   try{
-//     const quiz = await Quiz.getByCategory(req.params.category)
-// 	return res.json(quiz)
-//   } catch (e) {
-// 	return next(e)
-//   }
-// })
+// Get quiz by category for future features
+quizRouter.get('/cat/:category', async (req: Request, res: Response, next: NextFunction) => {
+  try{
+    const quiz = await Quiz.getByCategory(req.params.category)
+	return res.json(quiz)
+  } catch (e) {
+	return next(e)
+  }
+})
 
-/**Adds taken quiz to db */
-quizRouter.post('/', async (req: Request, res: Response, next: NextFunction) => {
+// Adds a new taken quiz to db 
+quizRouter.post('/', ensureLoggedIn, async (req: Request, res: Response, next: NextFunction) => {
   try{
 	const { category, score, user_id  } = req.body as QuizType
 	const quiz = await Quiz.addTakenQuiz(category, score, user_id)
@@ -46,18 +46,18 @@ quizRouter.post('/', async (req: Request, res: Response, next: NextFunction) => 
   }
 })
 
-/** Route to get all complete quizes by user */
-quizRouter.get('/user/:id', async (req: Request, res: Response, next: NextFunction) => {
+// Route to get all complete quizzes by user 
+quizRouter.get('/user/:id', ensureLoggedIn, async (req: Request, res: Response, next: NextFunction) => {
   try{
-    const quizes = await Quiz.getQuizesByUserId(+req.params.id)
-	  return res.json(quizes)
+    const quizzes = await Quiz.getQuizzesByUserId(+req.params.id)
+	  return res.json(quizzes)
   } catch (e) {
     return next(e)
   }
 })
 
-/** Route to update score */
-quizRouter.patch('/:id', async (req: Request, res: Response, next: NextFunction) => {
+// Route to update score 
+quizRouter.patch('/:id', ensureLoggedIn, async (req: Request, res: Response, next: NextFunction) => {
   const { score } = req.body
   try{
     const quiz = await Quiz.updateScore(+req.params.id, score)

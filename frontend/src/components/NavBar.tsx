@@ -16,6 +16,10 @@ interface INavBarProps {
   logout(): void
 }
 
+/** NavBar component contains Links to navigate through the app
+ * If there is a current user - renders set of links for logged in user
+ * Will render an expandable hamburger menu for smaller screen sizes
+ */
 export const NavBar: React.FunctionComponent<INavBarProps> = ({ logout }): JSX.Element => {
   const { currentUser } = useContext(UserContext)
   const [extension, setExtension] = useState(false)

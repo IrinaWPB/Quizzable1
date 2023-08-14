@@ -25,6 +25,7 @@ it("renders navigation for unauthorized users", () => {
   
   expect(getByText('Sign In')).toBeInTheDocument()
   expect(queryByText('Profile')).not.toBeInTheDocument()
+
 })
 
 it("renders navigation for authorized users", () => {
@@ -39,3 +40,4 @@ it("renders navigation for authorized users", () => {
   expect(getByText('Profile')).toBeInTheDocument()
   expect(queryByText('Sign In')).not.toBeInTheDocument()
 })
+

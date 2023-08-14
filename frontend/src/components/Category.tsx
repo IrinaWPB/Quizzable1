@@ -12,6 +12,9 @@ interface ICategoryProps {
   }
 }
 
+/** Category component represents a category card
+ * click on it will update a category code and navigate to a start-game route
+ */
 const Category: React.FunctionComponent<ICategoryProps> = ({ category }): JSX.Element => { 
   const navigate = useNavigate()
   const { setCode } = useContext(CategoryContext)

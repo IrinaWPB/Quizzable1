@@ -23,6 +23,14 @@ interface IQuestionsProps {
 
 export type FinalStatus = "You Won!!!" | "You Lose!" | "It's a tie"
 
+/** Questions component tracks all the values via Context,
+ * defines updateScore, play again, endGame and nextQuestion functions 
+ * using those values
+ * 
+ * Renders <StatusBar> and current question if game is still on(timer runs)
+ * Renders <EndGame> if time is out.
+ */
+
 const Questions: React.FunctionComponent<IQuestionsProps> = ({questions, setReady, setQuestions, opponentScore }): JSX.Element => {
   const { currentUser } = useContext(UserContext)
   const { online } = useContext(OnlineContext)
@@ -31,8 +39,9 @@ const Questions: React.FunctionComponent<IQuestionsProps> = ({questions, setRead
   const [questionNumber, setQuestionNumber] = useState(0)
   const [score, setScore] = useState(0)
   const [winner, setWinner] = useState<FinalStatus>(null)
-
+  
   const userId = clientSocketInstance.id
+
   //updates score state
   const updateScore = (): void => {
     setScore(score => score + 1)
@@ -69,7 +78,7 @@ const Questions: React.FunctionComponent<IQuestionsProps> = ({questions, setRead
     } 
   }
 
-  /**Resets score and starts a new game, updates currentQuiz state */
+  // Resets score and starts a new game
   const playAgain = (): void => {
     setScore(0)
     setQuestions([])
@@ -81,7 +90,7 @@ const Questions: React.FunctionComponent<IQuestionsProps> = ({questions, setRead
       {questionNumber < questions.length 
       ? <>
           <StatusBar>
-            <Timer endGame={ endGame }/>
+            <Timer endGame = { endGame }/>
             <Score score = { score } />
           </StatusBar>
           <Question 
@@ -90,7 +99,7 @@ const Questions: React.FunctionComponent<IQuestionsProps> = ({questions, setRead
             updateScore = { updateScore }
             nextQuestion = { nextQuestion }/>
         </>
-      : <EndGame score = { score } playAgain = { playAgain } status={winner}/>}
+      : <EndGame score = { score } playAgain = { playAgain } status = {winner}/>}
     </>
   )
 }

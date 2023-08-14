@@ -15,10 +15,18 @@ const ExpressError_1 = require("../ExpressError");
 const token_1 = require("../helpers/token");
 const User_1 = require("../models/User");
 exports.authRouter = (0, express_1.Router)();
-/**Register user */
+/** Register user route
+ *
+ * Checks if all fields are filled and there is no
+ * duplicate username, takes that data to
+ * create a new user and returns a JWT token which is used
+ * to keep user as "current" accross the app.
+ *
+*/
 exports.authRouter.post('/register', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { username, email, password } = req.body;
+        //make sure all fields are filled
         if (!username || !email || !password) {
             throw new ExpressError_1.ExpressError('All fields required', 400);
         }
@@ -27,12 +35,22 @@ exports.authRouter.post('/register', (req, res, next) => __awaiter(void 0, void 
         return res.json({ token });
     }
     catch (e) {
+        //specific SQL code for duplicate data
         if (e.code === '23505') {
             return next(new ExpressError_1.ExpressError('This username is taken', 400));
         }
         return next(e);
     }
 }));
+/** Login user route
+ *
+ * First checks if both username and password are provided,
+ * then checks if the data provided is valid using authenticate method
+ *
+ * Returns a JWT token if passed authentication
+ * to keep user as "current" accross the app.
+ *
+*/
 exports.authRouter.post('/login', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { username, password } = req.body;

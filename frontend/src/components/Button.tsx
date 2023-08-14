@@ -11,7 +11,8 @@ interface IButtonProps {
 }
 
 export const ButtonElement: React.FunctionComponent<IButtonProps> = ({classNames, actions, text, width, height = '50px', dangerouslySetInnerHTML }): JSX.Element => {
-  const handleClick = (action?: any) => {
+  //plays click sound and runs listed actions()
+  const handleClick = () => {
     if (actions) {
       actions()
     }

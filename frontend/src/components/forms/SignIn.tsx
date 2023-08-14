@@ -12,6 +12,11 @@ export interface ISignInProps {
   login: (loginData: LoginForm) => Promise<AuthorizationPromise>
 }
 
+/** SingIn component takes passed login() prop and uses it when data is submitted.
+ * Returns Login Form with 2 input fields (username and password)
+ * If login is successful - navigates to home page (token is stored in local starage)
+ */
+
 const SignIn: React.FunctionComponent<ISignInProps> = ({ login }): JSX.Element => {
 
   const navigate = useNavigate()
@@ -23,6 +28,7 @@ const SignIn: React.FunctionComponent<ISignInProps> = ({ login }): JSX.Element =
   const [data, setData] = useState(initialState)
   const [errors, setErrors] = useState([])
 
+  //tracks inputs state, updates it as user types
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const {name, value}= e.target
     setData(data=>({
@@ -31,6 +37,10 @@ const SignIn: React.FunctionComponent<ISignInProps> = ({ login }): JSX.Element =
     }))
   }
 
+  /** submits current state and pass the data into provided login function
+   * if entered data is invalid renders errors on top of the form and sets data to initial state
+   * navigates to homepage for registered users if login is successful
+   */
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault()
     const result = await login(data)
@@ -41,7 +51,7 @@ const SignIn: React.FunctionComponent<ISignInProps> = ({ login }): JSX.Element =
       setData(initialState)
     }
   }
-  console.log(errors)
+
   return(
     <FadeInDiv>
       <FormContainer>
@@ -66,7 +76,7 @@ const SignIn: React.FunctionComponent<ISignInProps> = ({ login }): JSX.Element =
                                           onMouseEnter={hoverSound}
                                           onClick={clickSound}>
                                             Register
-                                     </Link> here.
+                                       </Link> here.
       </Note>
     </FormContainer>
     </FadeInDiv>

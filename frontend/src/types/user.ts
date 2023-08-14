@@ -4,7 +4,7 @@ export type UserData = {
 	username: string;
 	email: string;
 	password: string;
-	quizes_id: number[] | null
+	quizzes_id: number[] | null
 }
 
 export type DecodedUser = {

@@ -24,7 +24,9 @@ export function authenticateJWT(req: Request, res: Response, next: NextFunction)
   }
 }
 
-/** If user in res.locals let access resticted route
+/** If user is logged id (found in "res.locals") let access restricted route
+ * 
+ * else throw 'Unauthorized" error with 401 status
  */
 export function ensureLoggedIn(req: Request, res: Response, next: NextFunction) {
   if(!res.locals.user) {

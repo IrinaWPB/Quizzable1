@@ -10,7 +10,7 @@ type OnlineStateType = {
   setOnlineStatus: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-type OnlinePlayersType = {
+export type OnlinePlayersType = {
   onlinePlayers: {
     [key: string] : string
   }

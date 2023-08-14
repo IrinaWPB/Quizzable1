@@ -11,6 +11,11 @@ import { UserContext } from "../../context/UserContext";
 
 interface IStartGameProps {}
 
+/**StartGame component for multiplayer game, 
+ * tracks and renders same values as regular StartGame plus
+ * opponents score (renders additional 'vs' block to see opponents score )
+ */ 
+
 const StartGame: React.FunctionComponent<IStartGameProps> = (): JSX.Element => {
   const { currentUser } = useContext(UserContext) 
   const { catCode } = useContext(CategoryContext)

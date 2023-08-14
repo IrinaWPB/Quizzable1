@@ -16,6 +16,10 @@ interface IRoutesProps {
  multiNavShow: boolean
 }
 
+/** AppRoutes component returns all the routes and takes 
+ * login(), register(), multiNavShow and setMultiNavShow passed by <App></App>
+ * to pass further to the routes.
+ */
 export const AppRoutes: React.FunctionComponent<IRoutesProps> = ({ login, register, setMultiNavShow, multiNavShow }): JSX.Element => {
   return (
 	<Routes>

@@ -8,17 +8,23 @@ import { Container, Header } from "../../styles/game.styles"
 
 interface IStartGameProps {}
 
+/** StartGame components is rendered when navigated to /start-game route
+ * it keeps track of a choosen category
+ * and takes two states
+ *  if ready renders the Questions component
+ *  if not - renders a "Ready?" screen with prompt to start game
+ */
+
 const StartGame: React.FunctionComponent<IStartGameProps> = (): JSX.Element => {
- 
   const { catCode } = useContext(CategoryContext)
- 
   const [questions, setQuestions] = useState([])
   const [ready, setReady] = useState(false)
   
-
-  //get 20 questions and add to state
+  /** gets 30 questions and updates the "questions" state,
+   * will run when "ready" state changes or user chooses a new category
+  */
   useEffect (() => {
-    let subscribed = true
+    let subscribed = true 
     async function getNewQuestions(code: number) {
       const newQuestions = await getQuestions(catCode)
       setQuestions(newQuestions)
@@ -29,6 +35,7 @@ const StartGame: React.FunctionComponent<IStartGameProps> = (): JSX.Element => {
     return () => {
       subscribed = false
     }
+  //sets dependecies
   }, [ready, catCode])
 
   return (

@@ -4,7 +4,7 @@ import { Button, Icon, Menu, MenuItemProps } from "semantic-ui-react"
 import { clientSocketInstance } from '../socketio-frontend'
 import { ButtonElement } from './Button'
 import { OnlineContainer } from '../styles/statusBar.styles'
-import { OnlineContext, UserContext, OnlinePlayersContext } from '../context/UserContext'
+import { OnlineContext, UserContext, OnlinePlayersContext, OnlinePlayersType } from '../context/UserContext'
 import { invitationSound } from './Sounds'
 
 interface IOnlineNavbarProps {}
@@ -15,19 +15,27 @@ enum MenuState {
   goOnline = "goOnline",
 }
 
+/** OnlineNavBar tracks state of multiple values:
+ * online state, current user, online players, playerId to be able
+ * to perform online game between 2 users via socket.io
+ * 
+ * Renders a block where user can "go_online", see online users and send game invitations.
+ */
 const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = () => {  
   const { online, setOnlineStatus } = React.useContext(OnlineContext)
   const { currentUser } = React.useContext(UserContext)
   const [ activeItem, setActiveItem ] = React.useState<MenuState>()
   const [ messageFrom, setMessageFrom ] = React.useState<string>(null)
-
   const { onlinePlayers, setOnlinePlayers } = useContext(OnlinePlayersContext)
   const playerId = clientSocketInstance.id
   const navigate = useNavigate()
 
+  //sets online status to true
   const setOnlineTrue = (): void => {
     setOnlineStatus(true);
   };
+
+  //sets online status to false, hides messages(if there are any) 
   const setOnlineFalse = (): void => {
     setOnlineStatus(false)
     //offline users can't see any invitations
@@ -35,7 +43,7 @@ const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = () => {
   };
 
   //updates online players
-  const handleOnlinePlayerChange = (data): void => {
+  const handleOnlinePlayerChange = (data: {[key: string] : string}): void => {
     setOnlinePlayers(data.players_online)
   };
 
@@ -47,25 +55,28 @@ const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = () => {
       clientSocketInstance.emit("go_online", { username: currentUser.username })
     }
   }
+
   //updates messageFrom state
   const handleMessageUpdate = (data: { invitation_from: string}): void => {
     setMessageFrom(data.invitation_from)
     invitationSound()
   }
   
-  //
+  //Sends invitation and navigates to wait for game to start
   const handleInvitationClick = (id: string): void => {
     clientSocketInstance.emit("send_invitation", { toId: id, fromId: playerId })
     navigate('/multi-game')
   } 
-
+  
+  //starts a game when joined
   const handleJoinGameClick = (id: string) => {
     navigate('/multi-game') 
     clientSocketInstance.emit("join_game", { toId: id, fromId: playerId })
   }
-
+  
+  //Click on Online players will set online status to true
   const handleItemClick = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>, data: MenuItemProps): void => {
-    //if not online and want to see online users switvh to online
+    //if not online and want to see online users switch to online
     if (!online && activeItem === MenuState.friends) {
       clientSocketInstance.emit("go_online", { username: currentUser.username })
     }

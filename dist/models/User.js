@@ -43,28 +43,7 @@ class User {
         this.email = email;
         this.password = password;
     }
-    /**Get all users method
-     * **** to be used for future features *******
-    */
-    static getAll() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const results = yield db_1.db.query(`SELECT * FROM users`);
-            const users = results.rows;
-            return users;
-        });
-    }
-    /**Get user by id */
-    static getById(id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const results = yield db_1.db.query(`SELECT * FROM users
-	   WHERE id = $1`, [id]);
-            const u = results.rows[0];
-            if (!u)
-                throw new ExpressError_1.NotFoundError();
-            return new User(u.id, u.username, u.email, u.password);
-        });
-    }
-    /**Get by username */
+    //_______Get by username, returns new User instance
     static getByUsename(username) {
         return __awaiter(this, void 0, void 0, function* () {
             const results = yield db_1.db.query(`SELECT * FROM users
@@ -75,9 +54,29 @@ class User {
             return new User(u.id, u.username, u.email, u.password);
         });
     }
-    /**Create a new user */
+    //_______Get all users method (future features)
+    static getAll() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const results = yield db_1.db.query(`SELECT * FROM users`);
+            const users = results.rows;
+            return users;
+        });
+    }
+    //_______Get user by id (future development)
+    static getById(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const results = yield db_1.db.query(`SELECT * FROM users
+	   WHERE id = $1`, [id]);
+            const u = results.rows[0];
+            if (!u)
+                throw new ExpressError_1.NotFoundError();
+            return new User(u.id, u.username, u.email, u.password);
+        });
+    }
+    //_______Adds a new user to DB, returns that user instance
     static create(username, email, password) {
         return __awaiter(this, void 0, void 0, function* () {
+            //password gets hashed first
             const hashedPassword = yield bcrypt.hash(password, process.env.BCRYPT_ROUNDS || 10);
             const results = yield db_1.db.query(`INSERT INTO users (username, email, password) 
 		VALUES ($1, $2, $3)
@@ -86,7 +85,7 @@ class User {
             return new User(u.id, u.username, u.email, u.password);
         });
     }
-    /**Log user in */
+    //______Authenticates user info using bcript.compare()
     static authenticate(username, password) {
         return __awaiter(this, void 0, void 0, function* () {
             const results = yield db_1.db.query(`SELECT * FROM users
@@ -98,6 +97,12 @@ class User {
                 }
             }
             throw new ExpressError_1.ExpressError('Invalid credentials', 403);
+        });
+    }
+    //_____Deletes user (future development)
+    static remove(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield db_1.db.query(`DELETE FROM users WHERE id = $1`, [id]);
         });
     }
 }

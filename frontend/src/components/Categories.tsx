@@ -10,6 +10,7 @@ import { CategoriesWrapper, WarningPage, Header } from "../styles/categories.sty
 
 interface ICategoriesProps {}
 
+// Component renders a list of categories cards for logged in users
 const Categories: React.FunctionComponent<ICategoriesProps> = (): JSX.Element => {
   const { currentUser } = useContext(UserContext)
   const navigate = useNavigate()
