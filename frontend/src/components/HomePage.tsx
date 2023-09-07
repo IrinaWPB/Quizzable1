@@ -32,8 +32,7 @@ const HomePage: React.FunctionComponent<IHomePageProps> = ({ setMultiNavShow, mu
   return (
     <HomePageWrapper>
 	  { multiNavShow &&
-	   <OnlineNavbar /> }
-	  <FadeInDiv>
+	   <OnlineNavbar setOnlineBar={setMultiNavShow}/> }
 		<Header>Quizzable</Header>
 		<FadeInDiv>
 		  <SlideLeftDiv>
@@ -61,7 +60,6 @@ const HomePage: React.FunctionComponent<IHomePageProps> = ({ setMultiNavShow, mu
 			  <ButtonElement text="Register" actions={() => navigate('/register')} /> 
 			</SlideRightDiv>
 		 </> }
-	  </FadeInDiv>
     </HomePageWrapper>
   )
 }

@@ -2,8 +2,9 @@ import styled from "styled-components";
 
 export const HomePageWrapper = styled.div`
   width: 100%;
-  height: 100vh;
-  padding-top: 7%;
+  height: 100vh; 
+  padding: 5% 0;
+
 `
 export const Header = styled.h1`
   text-align: center;

@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom'
 import { Button, Icon, Menu, MenuItemProps } from "semantic-ui-react"
 import { clientSocketInstance } from '../socketio-frontend'
 import { ButtonElement } from './Button'
-import { OnlineContainer } from '../styles/statusBar.styles'
-import { OnlineContext, UserContext, OnlinePlayersContext, OnlinePlayersType } from '../context/UserContext'
+import { OnlineContainer, MessageDiv, ChatContainer, CloseButton, SendButton } from '../styles/statusBar.styles'
+import { OnlineContext, UserContext, OnlinePlayersContext } from '../context/UserContext'
 import { invitationSound } from './Sounds'
-
+import { Header } from '../styles/statusBar.styles'
+import { Field, FormContainer, } from '../styles/form.styles'
 interface IOnlineNavbarProps {}
 
 enum MenuState {
@@ -15,18 +16,24 @@ enum MenuState {
   goOnline = "goOnline",
 }
 
+interface IOnlineNavbarProps {
+  setOnlineBar: (status: boolean) => void
+}
+
 /** OnlineNavBar tracks state of multiple values:
  * online state, current user, online players, playerId to be able
  * to perform online game between 2 users via socket.io
  * 
  * Renders a block where user can "go_online", see online users and send game invitations.
  */
-const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = () => {  
+const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = ({setOnlineBar}) => {  
   const { online, setOnlineStatus } = React.useContext(OnlineContext)
   const { currentUser } = React.useContext(UserContext)
   const [ activeItem, setActiveItem ] = React.useState<MenuState>()
   const [ messageFrom, setMessageFrom ] = React.useState<string>(null)
+  const [ chatMessage, setChatMessage ] = React.useState<string>("")
   const { onlinePlayers, setOnlinePlayers } = useContext(OnlinePlayersContext)
+  const [ chatOpen, setChatOpen ] = React.useState<boolean>(false)
   const playerId = clientSocketInstance.id
   const navigate = useNavigate()
 
@@ -40,6 +47,8 @@ const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = () => {
     setOnlineStatus(false)
     //offline users can't see any invitations
     setMessageFrom(null)
+    setActiveItem(MenuState.messages)
+    setChatOpen(false)
   };
 
   //updates online players
@@ -68,20 +77,32 @@ const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = () => {
     navigate('/multi-game')
   } 
   
+  //opens chat screen for both users
+  const handleStartChatClick = (id: string): void => {
+    clientSocketInstance.emit("start_chat", { toId: id, fromId: playerId })
+    setChatOpen(true)
+    setActiveItem(MenuState.messages)
+  } 
+  
   //starts a game when joined
   const handleJoinGameClick = (id: string) => {
     navigate('/multi-game') 
     clientSocketInstance.emit("join_game", { toId: id, fromId: playerId })
   }
   
-  //Click on Online players will set online status to true
+  //if player is online - sets active item to a clicked item
   const handleItemClick = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>, data: MenuItemProps): void => {
-    //if not online and want to see online users switch to online
-    if (!online && activeItem === MenuState.friends) {
-      clientSocketInstance.emit("go_online", { username: currentUser.username })
-    }
-    setActiveItem(data.name as MenuState)
+    if (online) setActiveItem(data.name as MenuState)
   };
+
+  //Takes current data (if valid) and passes it to register function, navigates to homepage.
+  const handleSendMessage = (e: React.FormEvent<HTMLButtonElement>): void => {
+    e.preventDefault()
+    // clientSocketInstance.emit("new_chat_message", { toId: id, fromId: playerId, chatMessage })
+
+    console.log('message sent', chatMessage)
+    setChatMessage("")
+  }
 
   React.useEffect(() => {
     clientSocketInstance.on("online", setOnlineTrue)
@@ -99,6 +120,7 @@ const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = () => {
 
   return (<>
     <OnlineContainer>
+    <CloseButton onClick={()=>setOnlineBar(false)}>X</CloseButton>
       <div style={{fontSize: "1.5rem"}}>
         <Menu.Item
           style={{margin: "10px"}}
@@ -106,14 +128,15 @@ const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = () => {
           active={activeItem === MenuState.messages}
           onClick={handleItemClick} />
           {messageFrom && <span>1</span>}
+       
         <Menu.Item
           style={{margin: "10px"}}
           name={MenuState.friends}
           active={activeItem === MenuState.friends}
           onClick={handleItemClick} /> 
-          { online && Object.keys(onlinePlayers).length > 0
-          ? <span>{Object.keys(onlinePlayers).length - 1 }</span>
-          : <span>{Object.keys(onlinePlayers).length}</span> } 
+          { !online || Object.keys(onlinePlayers).length === 0
+          ? <span>0</span>
+          : <span>{Object.keys(onlinePlayers).length - 1}</span> } 
       </div>
         
       <div>
@@ -125,13 +148,15 @@ const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = () => {
       </OnlineContainer> 
     { activeItem === MenuState.friends && Object.keys(onlinePlayers).length > 0 &&
       <OnlineContainer>
-        <h1>Live Players</h1>
-        <div>
+        <h1>Online Players</h1>
+        <div className='onlinePlayers'>
           {Object.keys(onlinePlayers).length > 0 
             ? Object.keys(onlinePlayers).map(key => 
               onlinePlayers[key] !== currentUser.username &&
                 <div key={key}>
-                  <ButtonElement actions={ () => handleInvitationClick(key) } text={ onlinePlayers[key] } />
+                  <Header>{ onlinePlayers[key] }</Header> 
+                  <ButtonElement actions={ () => handleInvitationClick(key) } text="Invite to play" />
+                  <ButtonElement actions={ () => handleStartChatClick(key) } text="Start Chat" />
                 </div> )
             : <p>No online players</p> 
             }
@@ -141,12 +166,24 @@ const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = () => {
       <OnlineContainer style={{flexDirection: "column"}}>
         <h1>Player {onlinePlayers[messageFrom]} invited you to play:</h1>
         <div>
-          <ButtonElement text="Join Game" actions={ () => handleJoinGameClick(messageFrom) } />
+          <ButtonElement text="Join Game" actions={ ()=>handleJoinGameClick(messageFrom) } />
         </div>
         <div>
-          <ButtonElement text="Cancel" actions={ ()=> setMessageFrom(null) } />
+          <ButtonElement text="Cancel" actions={ ()=>setMessageFrom(null) } />
         </div>
       </OnlineContainer> }
+      { chatOpen &&
+      <ChatContainer>
+        <CloseButton onClick={()=>setChatOpen(false)}>X</CloseButton>
+        <FormContainer>
+          <MessageDiv>
+              <textarea id="chatMessage" value={chatMessage} cols={30}
+                        name="chatMessage" placeholder='Enter message...'
+                        onChange={ (e) => setChatMessage(e.target.value) } />
+            <SendButton onClick={handleSendMessage}>Send</SendButton>
+          </MessageDiv> 
+        </FormContainer>
+      </ChatContainer>}  
     </>
 )}
 
