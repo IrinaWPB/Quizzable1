@@ -64,9 +64,9 @@ export const ChatContainer = styled.div`
   position: fixed;
   bottom: 5%;
   right: 5%;
-  background-color: rgb(255, 255, 255, 0.4);
+  background-color: rgb(255, 255, 255, 0.8);
   border-radius: 15px;
-  box-shadow: -2px -2px 10px lightblue;
+  box-shadow: -2px -2px 10px darkblue;
   width: 375px;
   height: 80vh;
   z-index: 100;

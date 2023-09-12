@@ -9,7 +9,7 @@ import { invitationSound, messageSound } from './Sounds'
 import { Header } from '../styles/statusBar.styles'
 import { FormContainer } from '../styles/form.styles'
 import chatIconSrc from '../assets/images/chat.png'
-import { ChatBody } from '../styles/chat.styles'
+import '../styles/chat.css'
 
 interface IOnlineNavbarProps {}
 
@@ -40,7 +40,7 @@ const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = ({setOnlineBar
   const [ chatIcon, setChatIcon ] = React.useState<boolean>(false)
   const playerId = clientSocketInstance.id
   const navigate = useNavigate()
-   
+  let newMessage: any = ""
   //sets online status to true
   const setOnlineTrue = (): void => {
     setOnlineStatus(true);
@@ -53,6 +53,7 @@ const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = ({setOnlineBar
     setMessageFrom(null)
     setActiveItem(MenuState.messages)
     setChatOpen(false)
+    setChatIcon(false)
   };
 
   //updates online players
@@ -81,13 +82,19 @@ const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = ({setOnlineBar
     navigate('/multi-game')
   } 
   
-  //opens chat screen for both users
+  //opens chat screen, sends players ids to server
   const handleStartChatClick = (id: string): void => {
+    console.log('starting chat chat icon is', chatIcon)
     clientSocketInstance.emit("start_chat", { toId: id, fromId: playerId })
     setChatOpen(true)
-    setChatIcon(true)
     setActiveItem(MenuState.messages)
   } 
+  //closes chat window and hides chatIcon
+  const closeChat = (): void => {
+    setChatIcon(false)
+    setChatOpen(false)
+    console.log(chatIcon, chatOpen)
+  }
   
   //starts a game when joined
   const handleJoinGameClick = (id: string) => {
@@ -102,17 +109,34 @@ const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = ({setOnlineBar
 
   const handleSendMessage = (e: React.FormEvent<HTMLButtonElement>): void => {
     e.preventDefault()
-    console.log(playerId)
+    if (!chatIcon) setChatIcon(true)
+   
     clientSocketInstance.emit("new_chat_message", { chatMessage, playerId })
-    
-    console.log('message sent', chatMessage)
+
+    const chat = document.querySelector('.chat_body')
+    let messageWrapper = document.createElement('div')
+    messageWrapper.className = 'my_message_wrapper'
+    let message = document.createElement('div')
+    message.className = 'my_message'
+    message.innerText = chatMessage
+    messageWrapper.append(message)
+    chat.append(messageWrapper)
     setChatMessage("")
   }
 
-  const handleNewMessage = (data: {message: string}): void => {
-    console.log(chatIcon)
-    if (chatIcon) {
-      console.log('Got Message', data.message)
+  const handleNewMessage = (data: {message: string, sender: string}): void => {
+    if (chatOpen) {
+      const chat = document.querySelector('.chat_body')
+      let messageWrapper = document.createElement('div')
+      messageWrapper.className = 'opponents_message_wrapper'
+      let message = document.createElement('div')
+      message.className = 'opponents_message'
+      message.innerText = data.message
+      let sender = document.createElement('span')
+      sender.innerText = data.sender
+      messageWrapper.append(sender)
+      messageWrapper.append(message)
+      chat.append(messageWrapper)
       messageSound()
     } else {
       setChatIcon(true)
@@ -134,11 +158,13 @@ const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = ({setOnlineBar
       clientSocketInstance.off("invitation", handleInvitationUpdate)
       clientSocketInstance.off("new_message", handleNewMessage)
     } 
-  }, [])
+  }, [chatIcon, chatOpen])
 
   return (<>
     <OnlineContainer>
-    <CloseButton onClick={()=>setOnlineBar(false)}>X</CloseButton>
+    <CloseButton onClick={() => {setOnlineBar(false)}}>
+        X
+    </CloseButton>
       <div style={{fontSize: "1.5rem"}}>
         <Menu.Item
           style={{margin: "10px"}}
@@ -196,11 +222,11 @@ const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = ({setOnlineBar
       </OnlineContainer> }
       { chatOpen &&
       <ChatContainer>
-        <CloseButton onClick={()=>{
-          setChatOpen(false)
-        }}>X</CloseButton>
-        <ChatBody>
-        </ChatBody>
+        <CloseButton onClick={closeChat}>X</CloseButton>
+
+        <div className='chat_body'>
+        </div>
+
         <FormContainer>
           <MessageDiv>
               <textarea id="chatMessage" value={chatMessage} cols={30}
