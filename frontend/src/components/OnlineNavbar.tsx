@@ -5,9 +5,12 @@ import { clientSocketInstance } from '../socketio-frontend'
 import { ButtonElement } from './Button'
 import { OnlineContainer, MessageDiv, ChatContainer, CloseButton, SendButton } from '../styles/statusBar.styles'
 import { OnlineContext, UserContext, OnlinePlayersContext } from '../context/UserContext'
-import { invitationSound } from './Sounds'
+import { invitationSound, messageSound } from './Sounds'
 import { Header } from '../styles/statusBar.styles'
-import { Field, FormContainer, } from '../styles/form.styles'
+import { FormContainer } from '../styles/form.styles'
+import chatIconSrc from '../assets/images/chat.png'
+import { ChatBody } from '../styles/chat.styles'
+
 interface IOnlineNavbarProps {}
 
 enum MenuState {
@@ -34,9 +37,10 @@ const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = ({setOnlineBar
   const [ chatMessage, setChatMessage ] = React.useState<string>("")
   const { onlinePlayers, setOnlinePlayers } = useContext(OnlinePlayersContext)
   const [ chatOpen, setChatOpen ] = React.useState<boolean>(false)
+  const [ chatIcon, setChatIcon ] = React.useState<boolean>(false)
   const playerId = clientSocketInstance.id
   const navigate = useNavigate()
-
+   
   //sets online status to true
   const setOnlineTrue = (): void => {
     setOnlineStatus(true);
@@ -66,7 +70,7 @@ const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = ({setOnlineBar
   }
 
   //updates messageFrom state
-  const handleMessageUpdate = (data: { invitation_from: string}): void => {
+  const handleInvitationUpdate = (data: { invitation_from: string}): void => {
     setMessageFrom(data.invitation_from)
     invitationSound()
   }
@@ -81,6 +85,7 @@ const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = ({setOnlineBar
   const handleStartChatClick = (id: string): void => {
     clientSocketInstance.emit("start_chat", { toId: id, fromId: playerId })
     setChatOpen(true)
+    setChatIcon(true)
     setActiveItem(MenuState.messages)
   } 
   
@@ -95,26 +100,39 @@ const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = ({setOnlineBar
     if (online) setActiveItem(data.name as MenuState)
   };
 
-  //Takes current data (if valid) and passes it to register function, navigates to homepage.
   const handleSendMessage = (e: React.FormEvent<HTMLButtonElement>): void => {
     e.preventDefault()
-    // clientSocketInstance.emit("new_chat_message", { toId: id, fromId: playerId, chatMessage })
-
+    console.log(playerId)
+    clientSocketInstance.emit("new_chat_message", { chatMessage, playerId })
+    
     console.log('message sent', chatMessage)
     setChatMessage("")
+  }
+
+  const handleNewMessage = (data: {message: string}): void => {
+    console.log(chatIcon)
+    if (chatIcon) {
+      console.log('Got Message', data.message)
+      messageSound()
+    } else {
+      setChatIcon(true)
+      invitationSound()
+    }
   }
 
   React.useEffect(() => {
     clientSocketInstance.on("online", setOnlineTrue)
     clientSocketInstance.on("offline", setOnlineFalse)
     clientSocketInstance.on("updated_online_players", handleOnlinePlayerChange)
-    clientSocketInstance.on("invitation", handleMessageUpdate)
+    clientSocketInstance.on("invitation", handleInvitationUpdate)
+    clientSocketInstance.on("new_message", handleNewMessage)
 
     return () => {
       clientSocketInstance.off("online", setOnlineTrue)
       clientSocketInstance.off("offline", setOnlineFalse)
       clientSocketInstance.off("updated_online_players", handleOnlinePlayerChange)
-      clientSocketInstance.off("invitation", handleMessageUpdate)
+      clientSocketInstance.off("invitation", handleInvitationUpdate)
+      clientSocketInstance.off("new_message", handleNewMessage)
     } 
   }, [])
 
@@ -138,7 +156,10 @@ const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = ({setOnlineBar
           ? <span>0</span>
           : <span>{Object.keys(onlinePlayers).length - 1}</span> } 
       </div>
-        
+      { chatIcon &&
+      <span onClick={()=>setChatOpen(true)} >
+        <img src={chatIconSrc} alt='chat_icon' width='30px'/>
+      </span> }
       <div>
         <Menu.Item style={{margin: "10px"}}>
           <Icon name="circle" color={ online ? "green" : "red" } style={{marginRight: "10px"}}/>
@@ -162,6 +183,7 @@ const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = ({setOnlineBar
             }
         </div>
       </OnlineContainer> }
+     
       { activeItem === MenuState.messages && messageFrom &&
       <OnlineContainer style={{flexDirection: "column"}}>
         <h1>Player {onlinePlayers[messageFrom]} invited you to play:</h1>
@@ -174,7 +196,11 @@ const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = ({setOnlineBar
       </OnlineContainer> }
       { chatOpen &&
       <ChatContainer>
-        <CloseButton onClick={()=>setChatOpen(false)}>X</CloseButton>
+        <CloseButton onClick={()=>{
+          setChatOpen(false)
+        }}>X</CloseButton>
+        <ChatBody>
+        </ChatBody>
         <FormContainer>
           <MessageDiv>
               <textarea id="chatMessage" value={chatMessage} cols={30}

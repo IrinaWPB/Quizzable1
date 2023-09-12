@@ -39,7 +39,6 @@ class SocketIOServer {
             socket.on("send_invitation", (data) => {
                 player1 = data.toId;
                 player2 = data.fromId;
-                console.log('player1', player1, 'player2', player2);
                 //emits to the opponent(sends invitation)
                 socket.to(player1).emit('invitation', { invitation_from: player2 });
             });
@@ -48,20 +47,30 @@ class SocketIOServer {
              * and game starts
              */
             socket.on("join_game", (data) => {
-                console.log("sending 'start_game' to", data.toId);
                 socket.to(data.toId).emit('start_game', { you: data.toId, opponent: onlinePlayers[data.fromId] });
-                console.log("sending 'start_game' to", data.fromId);
                 socket.emit('start_game', { you: data.fromId, opponent: onlinePlayers[data.toId] });
             });
             //when score changes, new score is emitted and updated for both users
             socket.on("score_update", (data) => {
-                console.log(data.newScore);
                 socket.emit("new_score", { score: data.newScore });
                 if (player1 === data.userId) {
                     socket.to(player2).emit("opponent_new_score", { score: data.newScore });
                 }
                 else {
                     socket.to(player1).emit("opponent_new_score", { score: data.newScore });
+                }
+            });
+            socket.on("start_chat", (data) => {
+                player1 = data.toId;
+                player2 = data.fromId;
+                console.log(player1, player2);
+            });
+            socket.on("new_chat_message", (data) => {
+                if (player1 === data.playerId) {
+                    socket.to(player2).emit('new_message', { message: data.chatMessage });
+                }
+                else if (player2 === data.playerId) {
+                    socket.to(player1).emit('new_message', { message: data.chatMessage });
                 }
             });
         });

@@ -7,8 +7,10 @@ import gameOver from '../assets/sounds/gameOver.wav'
 import timer from '../assets/sounds/timer.wav'
 import theme from '../assets/sounds/theme.mp3'
 import notification from '../assets/sounds/notification.wav'
+import message from '../assets/sounds/message.wav'
 
 export const clickSound = (): Promise<void> => new Audio(click).play() 
+export const messageSound = (): Promise<void> => new Audio(message).play() 
 export const hoverSound = (): Promise<void> => new Audio(hover).play()
 export const startSound = (): Promise<void> => new Audio(start).play()
 export const scoreSound = (): Promise<void> => new Audio(score).play()
