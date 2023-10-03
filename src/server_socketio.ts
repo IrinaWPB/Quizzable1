@@ -82,9 +82,9 @@ export default class SocketIOServer {
 
       socket.on("new_chat_message", (data) => {
         if (player1 === data.playerId) {
-          socket.to(player2).emit('new_message', { message: data.chatMessage, sender: onlinePlayers[player1] })
+          socket.to(player2).emit('new_message', { message: data.newOutgoingMessage, sender: onlinePlayers[player1] })
         } else if (player2 === data.playerId) {
-          socket.to(player1).emit('new_message', { message: data.chatMessage, sender: onlinePlayers[player2] })
+          socket.to(player1).emit('new_message', { message: data.newOutgoingMessage, sender: onlinePlayers[player2] })
         }
       })
 

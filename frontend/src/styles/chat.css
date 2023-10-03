@@ -1,9 +1,10 @@
 .chat_body {
-	height: 80%;
-	color: blue;
+	height: 75%;
+	color: rgb(1, 1, 48);
 	font-size: 15px;
-	margin-top: 50px;
-	overflow: hidden;
+	margin-top: 40px;
+	overflow-y: scroll;
+	scroll-behavior: smooth;
 }
 .my_message_wrapper {
 	display: flex;

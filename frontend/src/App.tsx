@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { NavBar } from './components/NavBar.tsx';
 import { AppRoutes } from './components/Routes.tsx';
-import { OnlineContext, UserContext, OnlinePlayersContext } from './context/UserContext.tsx';
+import { OnlineContext, UserContext, OnlinePlayersContext, ChatContext } from './context/UserContext.tsx';
 import { CategoryContext } from './context/CategoryContext.tsx';
 import UserApi from './api.ts';
 import useLocalStorage from './hooks/UseLocalStorage.tsx';
@@ -21,6 +21,7 @@ export const App: React.FunctionComponent = (): JSX.Element => {
   const [multiNavShow, setMultiNavShow] = useState<boolean>(false)
   const [online, setOnlineStatus] = useState<boolean>(false)
   const [onlinePlayers, setOnlinePlayers] = useState({})
+  const [chatMessages, setChatMessages] = useState([])
 
   /**  Load user info from API. Until a user is logged in and they have a token,
   * this should not run. It only needs to re-run when a user logs out(deletes token), so
@@ -93,6 +94,7 @@ export const App: React.FunctionComponent = (): JSX.Element => {
         <CategoryContext.Provider value={{ catCode, setCode }}>
         <OnlineContext.Provider value={{ online, setOnlineStatus }}>
         <OnlinePlayersContext.Provider value={{ onlinePlayers, setOnlinePlayers }}>
+        <ChatContext.Provider value={{chatMessages, setChatMessages}}>
           
           <NavBar logout = { logout } />
           <AppRoutesWrapper>
@@ -100,8 +102,9 @@ export const App: React.FunctionComponent = (): JSX.Element => {
                        setMultiNavShow={ (status: boolean) => setMultiNavShow(status) }
                        multiNavShow={multiNavShow}
                        /> 
-          </AppRoutesWrapper>
-        
+            </AppRoutesWrapper>
+
+        </ChatContext.Provider>
         </OnlinePlayersContext.Provider>
         </OnlineContext.Provider>
         </CategoryContext.Provider>

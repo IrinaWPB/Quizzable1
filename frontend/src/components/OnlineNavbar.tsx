@@ -4,12 +4,14 @@ import { Button, Icon, Menu, MenuItemProps } from "semantic-ui-react"
 import { clientSocketInstance } from '../socketio-frontend'
 import { ButtonElement } from './Button'
 import { OnlineContainer, MessageDiv, ChatContainer, CloseButton, SendButton } from '../styles/statusBar.styles'
-import { OnlineContext, UserContext, OnlinePlayersContext } from '../context/UserContext'
+import { OnlineContext, UserContext, OnlinePlayersContext, ChatContext, Message} from '../context/UserContext'
 import { invitationSound, messageSound } from './Sounds'
 import { Header } from '../styles/statusBar.styles'
 import { FormContainer } from '../styles/form.styles'
 import chatIconSrc from '../assets/images/chat.png'
 import '../styles/chat.css'
+//library for automatic scrolling
+import ScrollToBottom from 'react-scroll-to-bottom'
 
 interface IOnlineNavbarProps {}
 
@@ -30,17 +32,21 @@ interface IOnlineNavbarProps {
  * Renders a block where user can "go_online", see online users and send game invitations.
  */
 const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = ({setOnlineBar}) => {  
-  const { online, setOnlineStatus } = React.useContext(OnlineContext)
-  const { currentUser } = React.useContext(UserContext)
+  const { currentUser } = useContext(UserContext)
+  const { online, setOnlineStatus } = useContext(OnlineContext)
+  const { chatMessages, setChatMessages } = useContext(ChatContext)
+  const { onlinePlayers, setOnlinePlayers } = useContext(OnlinePlayersContext)
+
   const [ activeItem, setActiveItem ] = React.useState<MenuState>()
   const [ messageFrom, setMessageFrom ] = React.useState<string>(null)
-  const [ chatMessage, setChatMessage ] = React.useState<string>("")
-  const { onlinePlayers, setOnlinePlayers } = useContext(OnlinePlayersContext)
   const [ chatOpen, setChatOpen ] = React.useState<boolean>(false)
   const [ chatIcon, setChatIcon ] = React.useState<boolean>(false)
+  const [ newOutgoingMessage, setNewOutgoingMessage ] = React.useState<string>('')
+
   const playerId = clientSocketInstance.id
   const navigate = useNavigate()
-  let newMessage: any = ""
+
+
   //sets online status to true
   const setOnlineTrue = (): void => {
     setOnlineStatus(true);
@@ -54,6 +60,7 @@ const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = ({setOnlineBar
     setActiveItem(MenuState.messages)
     setChatOpen(false)
     setChatIcon(false)
+    setChatMessages([])
   };
 
   //updates online players
@@ -110,35 +117,25 @@ const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = ({setOnlineBar
   const handleSendMessage = (e: React.FormEvent<HTMLButtonElement>): void => {
     e.preventDefault()
     if (!chatIcon) setChatIcon(true)
-   
-    clientSocketInstance.emit("new_chat_message", { chatMessage, playerId })
+    if (newOutgoingMessage.length > 0) {
+      clientSocketInstance.emit("new_chat_message", { newOutgoingMessage, playerId })
+      addNewChatMessage(currentUser.username, newOutgoingMessage, true)
+    }
+  }
 
-    const chat = document.querySelector('.chat_body')
-    let messageWrapper = document.createElement('div')
-    messageWrapper.className = 'my_message_wrapper'
-    let message = document.createElement('div')
-    message.className = 'my_message'
-    message.innerText = chatMessage
-    messageWrapper.append(message)
-    chat.append(messageWrapper)
-    setChatMessage("")
+  const addNewChatMessage = (sender: string, message: string, outgoingStatus: boolean) => {
+    setChatMessages((messages: Message[]) => [...messages, {
+      senderName: sender,
+      messageBody: message,
+      outgoing: outgoingStatus
+    }])
+    messageSound()
+    if (outgoingStatus === true) setNewOutgoingMessage('')
   }
 
   const handleNewMessage = (data: {message: string, sender: string}): void => {
-    if (chatOpen) {
-      const chat = document.querySelector('.chat_body')
-      let messageWrapper = document.createElement('div')
-      messageWrapper.className = 'opponents_message_wrapper'
-      let message = document.createElement('div')
-      message.className = 'opponents_message'
-      message.innerText = data.message
-      let sender = document.createElement('span')
-      sender.innerText = data.sender
-      messageWrapper.append(sender)
-      messageWrapper.append(message)
-      chat.append(messageWrapper)
-      messageSound()
-    } else {
+    addNewChatMessage(data.sender, data.message, false)
+    if (!chatOpen) {
       setChatIcon(true)
       invitationSound()
     }
@@ -159,7 +156,7 @@ const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = ({setOnlineBar
       clientSocketInstance.off("new_message", handleNewMessage)
     } 
   }, [chatIcon, chatOpen])
-
+  console.log(chatMessages)
   return (<>
     <OnlineContainer>
     <CloseButton onClick={() => {setOnlineBar(false)}}>
@@ -220,18 +217,28 @@ const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = ({setOnlineBar
           <ButtonElement text="Cancel" actions={ ()=>setMessageFrom(null) } />
         </div>
       </OnlineContainer> }
+
       { chatOpen &&
       <ChatContainer>
         <CloseButton onClick={closeChat}>X</CloseButton>
-
-        <div className='chat_body'>
-        </div>
-
+          <ScrollToBottom className='chat_body'>
+            {chatMessages && 
+              chatMessages.map((m: Message) => 
+                m.outgoing === false ?
+                  <div className='opponents_message_wrapper'>
+                    {m.senderName} <div className='opponents_message'>{m.messageBody}</div>
+                  </div>
+                :
+                <div className='my_message_wrapper'>
+                  <div className='my_message'>{m.messageBody}</div>
+                </div>
+            )}
+          </ScrollToBottom>
         <FormContainer>
           <MessageDiv>
-              <textarea id="chatMessage" value={chatMessage} cols={30}
+              <textarea id="chatMessage" value={newOutgoingMessage} cols={30}
                         name="chatMessage" placeholder='Enter message...'
-                        onChange={ (e) => setChatMessage(e.target.value) } />
+                        onChange={(e) => setNewOutgoingMessage(e.target.value)} />
             <SendButton onClick={handleSendMessage}>Send</SendButton>
           </MessageDiv> 
         </FormContainer>
