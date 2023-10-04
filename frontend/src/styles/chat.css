@@ -42,5 +42,15 @@ textarea {
 	padding-left: 10px;
 }
 
+.timestamp {
+	text-align: end;
+	color: rgb(1, 1, 48);
+	font-size: 0.8rem;
+}
+
+.read {
+	margin-left: 2px;
+	color: greenyellow
+}
 
 

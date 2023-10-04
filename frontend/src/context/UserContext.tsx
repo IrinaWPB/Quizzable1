@@ -21,7 +21,9 @@ export type OnlinePlayersType = {
 export type Message = {
   senderName: string,
   messageBody: string,
-  outgoing: boolean
+  outgoing: boolean,
+  timestamp: Date,
+  read: boolean
 }
 
 type ChatMessagesType = {

@@ -38,10 +38,12 @@ const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = ({setOnlineBar
   const { onlinePlayers, setOnlinePlayers } = useContext(OnlinePlayersContext)
 
   const [ activeItem, setActiveItem ] = React.useState<MenuState>()
-  const [ messageFrom, setMessageFrom ] = React.useState<string>(null)
+  const [ invitationFrom, setInvitationFrom ] = React.useState<string>(null)
   const [ chatOpen, setChatOpen ] = React.useState<boolean>(false)
   const [ chatIcon, setChatIcon ] = React.useState<boolean>(false)
   const [ newOutgoingMessage, setNewOutgoingMessage ] = React.useState<string>('')
+  const [ isRead, setIsRead ] = React.useState<boolean>(false)
+  const [ opponentId, setOpponentId] = React.useState<string>(null)
 
   const playerId = clientSocketInstance.id
   const navigate = useNavigate()
@@ -56,7 +58,7 @@ const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = ({setOnlineBar
   const setOnlineFalse = (): void => {
     setOnlineStatus(false)
     //offline users can't see any invitations
-    setMessageFrom(null)
+    setInvitationFrom(null)
     setActiveItem(MenuState.messages)
     setChatOpen(false)
     setChatIcon(false)
@@ -78,8 +80,8 @@ const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = ({setOnlineBar
   }
 
   //updates messageFrom state
-  const handleInvitationUpdate = (data: { invitation_from: string}): void => {
-    setMessageFrom(data.invitation_from)
+  const handleInvitationUpdate = (data: {invitation_from: string}): void => {
+    setInvitationFrom(data.invitation_from)
     invitationSound()
   }
   
@@ -91,16 +93,18 @@ const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = ({setOnlineBar
   
   //opens chat screen, sends players ids to server
   const handleStartChatClick = (id: string): void => {
-    console.log('starting chat chat icon is', chatIcon)
+    console.log('opponent', id)
     clientSocketInstance.emit("start_chat", { toId: id, fromId: playerId })
+    setOpponentId(id)
     setChatOpen(true)
     setActiveItem(MenuState.messages)
+    console.log('opponent id', opponentId, 'opponent name', onlinePlayers[opponentId])
   } 
   //closes chat window and hides chatIcon
-  const closeChat = (): void => {
+  const closeChat = (id: string): void => {
+    clientSocketInstance.emit("send_unread_reciept", id)
     setChatIcon(false)
     setChatOpen(false)
-    console.log(chatIcon, chatOpen)
   }
   
   //starts a game when joined
@@ -118,44 +122,60 @@ const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = ({setOnlineBar
     e.preventDefault()
     if (!chatIcon) setChatIcon(true)
     if (newOutgoingMessage.length > 0) {
-      clientSocketInstance.emit("new_chat_message", { newOutgoingMessage, playerId })
-      addNewChatMessage(currentUser.username, newOutgoingMessage, true)
+      clientSocketInstance.emit("new_chat_message", { newOutgoingMessage, playerId, opponentId })
+      addNewChatMessage(currentUser.username, newOutgoingMessage, true, isRead)
     }
   }
 
-  const addNewChatMessage = (sender: string, message: string, outgoingStatus: boolean) => {
+  const addNewChatMessage = (sender: string, message: string, outgoingStatus: boolean, readStatus: boolean) => {
     setChatMessages((messages: Message[]) => [...messages, {
       senderName: sender,
       messageBody: message,
-      outgoing: outgoingStatus
+      outgoing: outgoingStatus,
+      timestamp: new Date(),
+      read: readStatus
     }])
     messageSound()
     if (outgoingStatus === true) setNewOutgoingMessage('')
   }
 
   const handleNewMessage = (data: {message: string, sender: string}): void => {
-    addNewChatMessage(data.sender, data.message, false)
+    console.log('Got new message')
+    addNewChatMessage(onlinePlayers[data.sender], data.message, false, isRead)
     if (!chatOpen) {
       setChatIcon(true)
       invitationSound()
     }
   }
+  const handleChatIconClick = (id: string): void => {
+    clientSocketInstance.emit("send_read_reciept", id)
+    setChatOpen(true)
+    setIsRead(true)
+  }
 
+  const handleReadStatus = (status: boolean) => {
+    console.log('Opponent read my messages')
+    setIsRead(status)
+  }
   React.useEffect(() => {
     clientSocketInstance.on("online", setOnlineTrue)
     clientSocketInstance.on("offline", setOnlineFalse)
     clientSocketInstance.on("updated_online_players", handleOnlinePlayerChange)
     clientSocketInstance.on("invitation", handleInvitationUpdate)
     clientSocketInstance.on("new_message", handleNewMessage)
+    clientSocketInstance.on("messages_read", ()=>handleReadStatus(true))
+    clientSocketInstance.on("messages_not_read", ()=>handleReadStatus(false))
 
     return () => {
       clientSocketInstance.off("online", setOnlineTrue)
-      clientSocketInstance.off("offline", setOnlineFalse)
+      clientSocketInstance.off("offline", setOnlineFalse) 
       clientSocketInstance.off("updated_online_players", handleOnlinePlayerChange)
       clientSocketInstance.off("invitation", handleInvitationUpdate)
       clientSocketInstance.off("new_message", handleNewMessage)
+      clientSocketInstance.off("messages_read", ()=>handleReadStatus(true))
+      clientSocketInstance.off("messages_not_read", ()=>handleReadStatus(false))
     } 
-  }, [chatIcon, chatOpen])
+  }, [chatIcon, chatOpen, opponentId])
   console.log(chatMessages)
   return (<>
     <OnlineContainer>
@@ -168,7 +188,7 @@ const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = ({setOnlineBar
           name={MenuState.messages}
           active={activeItem === MenuState.messages}
           onClick={handleItemClick} />
-          {messageFrom && <span>1</span>}
+          {invitationFrom && <span>1</span>}
        
         <Menu.Item
           style={{margin: "10px"}}
@@ -180,7 +200,7 @@ const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = ({setOnlineBar
           : <span>{Object.keys(onlinePlayers).length - 1}</span> } 
       </div>
       { chatIcon &&
-      <span onClick={()=>setChatOpen(true)} >
+      <span onClick={ ()=>handleChatIconClick(opponentId) } >
         <img src={chatIconSrc} alt='chat_icon' width='30px'/>
       </span> }
       <div>
@@ -207,30 +227,51 @@ const OnlineNavbar: React.FunctionComponent<IOnlineNavbarProps> = ({setOnlineBar
         </div>
       </OnlineContainer> }
      
-      { activeItem === MenuState.messages && messageFrom &&
+      { activeItem === MenuState.messages && invitationFrom &&
       <OnlineContainer style={{flexDirection: "column"}}>
-        <h1>Player {onlinePlayers[messageFrom]} invited you to play:</h1>
+        <h1>Player {onlinePlayers[invitationFrom]} invited you to play:</h1>
         <div>
-          <ButtonElement text="Join Game" actions={ ()=>handleJoinGameClick(messageFrom) } />
+          <ButtonElement text="Join Game" actions={ ()=>handleJoinGameClick(invitationFrom) } />
         </div>
         <div>
-          <ButtonElement text="Cancel" actions={ ()=>setMessageFrom(null) } />
+          <ButtonElement text="Cancel" actions={ ()=>setInvitationFrom(null) } />
         </div>
       </OnlineContainer> }
 
       { chatOpen &&
       <ChatContainer>
-        <CloseButton onClick={closeChat}>X</CloseButton>
+        <CloseButton onClick={()=>closeChat(opponentId)}><span>{currentUser.username}</span> X</CloseButton>
           <ScrollToBottom className='chat_body'>
             {chatMessages && 
               chatMessages.map((m: Message) => 
                 m.outgoing === false ?
-                  <div className='opponents_message_wrapper'>
-                    {m.senderName} <div className='opponents_message'>{m.messageBody}</div>
+                  <div key={m.messageBody} className='opponents_message_wrapper'>
+                    <div className='sendersName'>
+                      <p>{m.senderName}</p>
+                    </div>
+                    <div className='opponents_message'>
+                      <div className='message_body'>
+                        <p>{m.messageBody}</p>
+                      </div>
+                      <div className='timestamp'>
+                        <p>{m.timestamp.getHours()}:{m.timestamp.getMinutes()}</p>
+                      </div>
+                    </div>
                   </div>
                 :
-                <div className='my_message_wrapper'>
-                  <div className='my_message'>{m.messageBody}</div>
+                <div key={m.messageBody} className='my_message_wrapper'>
+                  <div className='my_message'>
+                    <div className='message_body'>
+                      <p>{m.messageBody}</p>
+                    </div>
+                    <div className='timestamp'>
+                      <p>
+                        {m.timestamp.getHours()}:{m.timestamp.getMinutes()}
+                        {isRead && 
+                          <span className="read">✔</span>}
+                      </p>
+                    </div>
+                  </div>
                 </div>
             )}
           </ScrollToBottom>

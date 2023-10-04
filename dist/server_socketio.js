@@ -63,15 +63,19 @@ class SocketIOServer {
             socket.on("start_chat", (data) => {
                 player1 = data.toId;
                 player2 = data.fromId;
-                console.log(player1, player2);
+                console.log('players', player1, player2);
+            });
+            socket.on("send_read_reciept", (id) => {
+                console.log('read', id);
+                socket.to(id).emit('messages_read');
+            });
+            socket.on("send_unread_reciept", (id) => {
+                console.log('unread', id);
+                socket.to(id).emit('messages_not_read');
             });
             socket.on("new_chat_message", (data) => {
-                if (player1 === data.playerId) {
-                    socket.to(player2).emit('new_message', { message: data.newOutgoingMessage, sender: onlinePlayers[player1] });
-                }
-                else if (player2 === data.playerId) {
-                    socket.to(player1).emit('new_message', { message: data.newOutgoingMessage, sender: onlinePlayers[player2] });
-                }
+                console.log('sending new message to', onlinePlayers[data.opponentId]);
+                socket.to(data.opponentId).emit('new_message', { message: data.newOutgoingMessage, sender: data.playerId });
             });
         });
     }
