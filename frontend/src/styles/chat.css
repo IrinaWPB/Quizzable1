@@ -1,6 +1,5 @@
 .chat_body {
 	height: 75%;
-	color: rgb(1, 1, 48);
 	font-size: 15px;
 	margin-top: 40px;
 	overflow-y: scroll;
@@ -14,25 +13,34 @@
 .my_message {
 	background-color: rgb(63, 91, 176);
 	box-shadow: 2px 2px 5px rgb(54, 42, 128);
+	border-radius: 8px 8px 0 8px;
+	
 }
 
 .opponents_message {
 	background-color: rgb(139, 180, 242);
 	box-shadow: 2px 2px 5px darkslateblue;
+	border-radius: 8px 8px 8px 0;
 }
 
 .my_message, .opponents_message {
 	color: white;
-  border-radius: 5px;
 	margin: 10px;
   padding: 3px 5px;
 }
 
 .opponents_message_wrapper {
-  color: rgb(45, 45, 80);
-	display: flex;
-	align-items: center;
+
 	margin-left: 10px;
+	width: fit-content;
+}
+
+.sendersName {
+	text-transform: capitalize;
+	text-align: start;
+  font-weight: 600;
+	font-family: Arial, Helvetica, sans-serif;
+  color: rgb(45, 45, 80);
 }
 
 textarea {

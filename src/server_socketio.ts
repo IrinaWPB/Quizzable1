@@ -24,14 +24,11 @@ export default class SocketIOServer {
 
     //start listening for emitters when connection is on
     this.io.on("connection", (socket) => {
-      console.log("client connected");
-      console.log(socket.id);
-
+    
       // adds user to online players list when user clicks "go_online"
       socket.on("go_online", (data) => {
         onlinePlayers[socket.id] = data.username ;
         socket.emit("online", "you are online");
-        console.log('onlinePlayers:', onlinePlayers);
         // emit to everyone the new number of online players //
         this.io.emit("updated_online_players", { players_online: onlinePlayers });
       })
@@ -40,7 +37,6 @@ export default class SocketIOServer {
       socket.on("go_offline", () => {
         delete onlinePlayers[socket.id]
         socket.emit("offline", "you are offline");
-        console.log(onlinePlayers);
         // emit to everyone the new number of online players //
         this.io.emit("updated_online_players", { players_online: onlinePlayers});
       })
@@ -77,7 +73,10 @@ export default class SocketIOServer {
       socket.on("start_chat", (data) => {
         player1 = data.toId
         player2 = data.fromId
-        console.log('players', player1, player2)
+      })
+
+      socket.on("new_chat_message", (data) => {
+        socket.to(data.opponentId).emit('new_message', { message: data.newOutgoingMessage, sender: data.playerId} )
       })
 
       socket.on("send_read_reciept", (id) => {
@@ -87,13 +86,7 @@ export default class SocketIOServer {
       })
 
       socket.on("send_unread_reciept", (id) => {
-        console.log('unread', id)
         socket.to(id).emit('messages_not_read')
-      })
-
-      socket.on("new_chat_message", (data) => {
-        console.log('sending new message to', onlinePlayers[data.opponentId])
-        socket.to(data.opponentId).emit('new_message', { message: data.newOutgoingMessage, sender: data.playerId} )
       })
 
     });
