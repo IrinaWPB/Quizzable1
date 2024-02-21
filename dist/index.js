@@ -22,6 +22,7 @@ new server_socketio_1.default(server).init();
 app.use(express_1.default.json()); //if json sent
 app.use(express_1.default.urlencoded({ extended: true })); //if form data sent
 app.use(auth_1.authenticateJWT); //middleware to check if a token sent with request is valid
+app.use('/', express_1.default.static('./frontend/build'));
 app.use('/api/users', userRoutes_1.userRouter);
 app.use('/api/auth', authRoutes_1.authRouter);
 app.use('/api/quizzes', quizRoutes_1.quizRouter);
