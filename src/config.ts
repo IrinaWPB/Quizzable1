@@ -1,4 +1,13 @@
-export const port: undefined | number | string = process.env.PORT || 3001;
+export let port: undefined | number | string;
+if (process.env.NODE_ENV === "production") {
+   port = process.env.PORT || 10000;
+} else {
+   port = 3001;
+}
+
+
+
+
 export let DB_URI: string;
 if (process.env.NODE_ENV === "test") {
    DB_URI = "postgresql:///capUsersdb_test"

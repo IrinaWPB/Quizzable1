@@ -4,5 +4,5 @@ import { port } from './config'
 dotenv.config()
 
 app.listen(port, function() {
-  console.log(`Running on http://localhost:${port}`)
+  console.log(`Running on ${port}`)
 })
