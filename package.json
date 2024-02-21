@@ -9,9 +9,9 @@
     "ts-dev": " nodemon src/server.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "ts-test": "jest",
-    "heroku-postbuild": "cd frontend && npm install && npm run build",
-    "build": "cd frontend && npm install && npm start"
+    "heroku-postbuild": "cd frontend && npm install && npm run build"
   },
+
   "keywords": [],
   "author": "",
   "license": "ISC",

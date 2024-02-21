@@ -25,7 +25,7 @@ app.use(express.json()) //if json sent
 app.use(express.urlencoded({ extended: true })) //if form data sent
 
 app.use(authenticateJWT)//middleware to check if a token sent with request is valid
-
+app.use('/', express.static('./frontend/build'))
 app.use('/api/users', userRouter)
 app.use('/api/auth', authRouter)
 app.use('/api/quizzes', quizRouter)
