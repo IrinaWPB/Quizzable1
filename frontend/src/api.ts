@@ -5,7 +5,7 @@ import { Quiz } from "./types/quiz";
 
 
 //const BASE_URL = `https://quizzable-a90200121f06.herokuapp.com/api`; //-production
-const BASE_URL = `http://localhost:3001/api`;
+const BASE_URL = `https://quizzable-oqah.onrender.com/api`;
 
 /** API Class.
  *
